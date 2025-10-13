@@ -135,7 +135,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredProducts.map((product, index) => (
-              <Link href={`/products/${product.id}`}>
+              <Link href={`/products/${product.id}`} key={product.id}>
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}

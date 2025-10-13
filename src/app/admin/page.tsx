@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
   Users, 
@@ -14,7 +15,9 @@ import {
   Trash2,
   Plus,
   Search,
-  Filter
+  Filter,
+  LogOut,
+  Shield
 } from 'lucide-react';
 
 // Mock data for admin dashboard
@@ -114,6 +117,35 @@ const topProducts = [
 
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [adminUser, setAdminUser] = useState('');
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is authenticated via cookies
+    const getCookie = (name: string) => {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(';').shift();
+      return null;
+    };
+    
+    const adminAuth = getCookie('adminAuth');
+    const user = getCookie('adminUser');
+    
+    if (!adminAuth || adminAuth !== 'true') {
+      router.push('/admin/login');
+      return;
+    }
+    
+    setAdminUser(user || 'Admin');
+  }, [router]);
+
+  const handleLogout = () => {
+    // Clear admin session cookies
+    document.cookie = 'adminAuth=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = 'adminUser=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    router.push('/admin/login');
+  };
 
   const getStatusColor = (status: string) => {
     const colors = {
@@ -142,22 +174,33 @@ export default function AdminDashboard() {
       {/* Header */}
       <div className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-playfair font-bold text-gray-900">
-                Bảng điều khiển
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Quản lý cửa hàng Aura
-              </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-3xl font-playfair font-bold text-gray-900">
+                  Bảng điều khiển
+                </h1>
+                <p className="text-gray-600 mt-1">
+                  Quản lý cửa hàng Aura
+                </p>
+              </div>
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                  <Shield className="h-4 w-4" />
+                  <span>Xin chào, {adminUser}</span>
+                </div>
+                <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Thêm sản phẩm
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Đăng xuất
+                </button>
+              </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
-                <Plus className="h-4 w-4 mr-2" />
-                Thêm sản phẩm
-              </button>
-            </div>
-          </div>
         </div>
       </div>
 

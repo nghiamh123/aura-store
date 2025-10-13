@@ -6,6 +6,7 @@ import { Search, Filter, Star, Heart, ShoppingBag, Grid, List, X } from 'lucide-
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
+import { Product } from '@/types/product';
 
 // Mock search data
 const searchResults = [
@@ -117,7 +118,7 @@ export default function SearchPage() {
     setFilteredResults(results);
   }, [searchTerm, selectedCategory, sortBy]);
 
-  const handleAddToCart = (item: any) => {
+  const handleAddToCart = (item: Product) => {
     addToCart({
       id: item.id,
       name: item.name,
@@ -127,7 +128,7 @@ export default function SearchPage() {
     });
   };
 
-  const handleWishlistToggle = (item: any) => {
+  const handleWishlistToggle = (item: Product) => {
     if (isInWishlist(item.id)) {
       removeFromWishlist(item.id);
     } else {
