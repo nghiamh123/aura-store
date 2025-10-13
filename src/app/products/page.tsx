@@ -1,135 +1,84 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Star, Heart, ShoppingBag, Grid, List } from 'lucide-react';
 import Link from 'next/link';
+import { API_BASE_URL } from '@/lib/api';
 
-// Mock data for products
-const products = [
-  {
-    id: 1,
-    name: 'Đồng hồ nam sang trọng',
-    price: '299,000',
-    originalPrice: '399,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.8,
-    reviews: 128,
-    category: 'watches',
-    badge: 'Bán chạy'
-  },
-  {
-    id: 2,
-    name: 'Túi xách nữ thời trang',
-    price: '199,000',
-    originalPrice: '299,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.6,
-    reviews: 95,
-    category: 'bags',
-    badge: 'Mới'
-  },
-  {
-    id: 3,
-    name: 'Vòng tay trang sức',
-    price: '89,000',
-    originalPrice: '149,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.9,
-    reviews: 203,
-    category: 'jewelry',
-    badge: 'Giảm giá'
-  },
-  {
-    id: 4,
-    name: 'Kính mát thời trang',
-    price: '159,000',
-    originalPrice: '229,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.7,
-    reviews: 76,
-    category: 'accessories',
-    badge: 'Hot'
-  },
-  {
-    id: 5,
-    name: 'Nhẫn bạc cao cấp',
-    price: '129,000',
-    originalPrice: '199,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.5,
-    reviews: 87,
-    category: 'jewelry',
-    badge: 'Giảm giá'
-  },
-  {
-    id: 6,
-    name: 'Ví da nam',
-    price: '179,000',
-    originalPrice: '249,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.4,
-    reviews: 156,
-    category: 'accessories',
-    badge: 'Mới'
-  },
-  {
-    id: 7,
-    name: 'Đồng hồ nữ dây da',
-    price: '249,000',
-    originalPrice: '349,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.8,
-    reviews: 92,
-    category: 'watches',
-    badge: 'Bán chạy'
-  },
-  {
-    id: 8,
-    name: 'Túi đeo chéo unisex',
-    price: '149,000',
-    originalPrice: '199,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.6,
-    reviews: 134,
-    category: 'bags',
-    badge: 'Hot'
-  }
-];
-
-const categories = [
-  { id: 'all', name: 'Tất cả', count: products.length },
-  { id: 'watches', name: 'Đồng hồ', count: products.filter(p => p.category === 'watches').length },
-  { id: 'bags', name: 'Túi xách', count: products.filter(p => p.category === 'bags').length },
-  { id: 'jewelry', name: 'Trang sức', count: products.filter(p => p.category === 'jewelry').length },
-  { id: 'accessories', name: 'Phụ kiện', count: products.filter(p => p.category === 'accessories').length },
-];
+export type ProductItem = {
+  id: number;
+  name: string;
+  description?: string;
+  price: number;
+  originalPrice?: number;
+  image?: string;
+  rating?: number;
+  reviews?: number;
+  category: string;
+  badge?: string;
+};
 
 export default function ProductsPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('popular');
+  const [sortBy, setSortBy] = useState<'popular' | 'price-low' | 'price-high' | 'rating'>('popular');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
 
-  const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const [products, setProducts] = useState<ProductItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const res = await fetch(`${API_BASE_URL}/products`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
+        const data = await res.json();
+        setProducts((data?.products || []) as ProductItem[]);
+      } catch (e: any) {
+        setError(e.message || 'Không tải được sản phẩm');
+      } finally {
+        setLoading(false);
+      }
+    };
+    void load();
+  }, []);
+
+  const categories = useMemo(() => {
+    const map: Record<string, number> = {};
+    for (const p of products) {
+      map[p.category] = (map[p.category] || 0) + 1;
+    }
+    const arr = Object.entries(map).map(([id, count]) => ({ id, name: id, count }));
+    return [{ id: 'all', name: 'Tất cả', count: products.length }, ...arr];
+  }, [products]);
+
+  const filteredProducts = useMemo(() => {
+    const t = searchTerm.toLowerCase();
+    return products.filter((product) => {
+      const matchesSearch = product.name.toLowerCase().includes(t);
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [products, searchTerm, selectedCategory]);
+
+  const sortedProducts = useMemo(() => {
+    const arr = [...filteredProducts];
     switch (sortBy) {
       case 'price-low':
-        return parseInt(a.price.replace(/,/g, '')) - parseInt(b.price.replace(/,/g, ''));
+        return arr.sort((a, b) => (a.price || 0) - (b.price || 0));
       case 'price-high':
-        return parseInt(b.price.replace(/,/g, '')) - parseInt(a.price.replace(/,/g, ''));
+        return arr.sort((a, b) => (b.price || 0) - (a.price || 0));
       case 'rating':
-        return b.rating - a.rating;
+        return arr.sort((a, b) => (b.rating || 0) - (a.rating || 0));
       default:
-        return 0;
+        return arr;
     }
-  });
+  }, [filteredProducts, sortBy]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,6 +95,9 @@ export default function ProductsPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {error && (
+          <div className="mb-4 text-sm text-red-600">{error}</div>
+        )}
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar Filters */}
           <div className="lg:w-64 flex-shrink-0">
@@ -198,7 +150,7 @@ export default function ProductsPage() {
                 </label>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => setSortBy(e.target.value as any)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="popular">Phổ biến</option>
@@ -223,7 +175,7 @@ export default function ProductsPage() {
                   Bộ lọc
                 </button>
                 <p className="text-sm text-gray-600">
-                  Hiển thị {sortedProducts.length} sản phẩm
+                  {loading ? 'Đang tải…' : `Hiển thị ${sortedProducts.length} sản phẩm`}
                 </p>
               </div>
               
@@ -266,7 +218,11 @@ export default function ProductsPage() {
                   >
                   <div className={`relative ${viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}`}>
                     <div className={`${viewMode === 'list' ? 'h-48' : 'aspect-square'} bg-gray-100 flex items-center justify-center`}>
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
+                      {product.image ? (
+                        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
+                      )}
                     </div>
                     {product.badge && (
                       <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
@@ -289,26 +245,28 @@ export default function ProductsPage() {
                           <Star
                             key={i}
                             className={`h-4 w-4 ${
-                              i < Math.floor(product.rating)
+                              i < Math.floor(product.rating || 0)
                                 ? 'text-yellow-400 fill-current'
                                 : 'text-gray-300'
                             }`}
                           />
                         ))}
                       </div>
-                      <span className="text-sm text-gray-500 ml-2">
-                        ({product.reviews})
-                      </span>
+                      {typeof product.reviews === 'number' && (
+                        <span className="text-sm text-gray-500 ml-2">({product.reviews})</span>
+                      )}
                     </div>
                     
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="text-lg font-bold text-purple-600">
-                          {product.price}đ
+                          {Number(product.price || 0).toLocaleString()}đ
                         </span>
-                        <span className="text-sm text-gray-500 line-through">
-                          {product.originalPrice}đ
-                        </span>
+                        {product.originalPrice ? (
+                          <span className="text-sm text-gray-500 line-through">
+                            {Number(product.originalPrice).toLocaleString()}đ
+                          </span>
+                        ) : null}
                       </div>
                       <button className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                         <ShoppingBag className="h-4 w-4" />
@@ -320,7 +278,7 @@ export default function ProductsPage() {
               ))}
             </div>
 
-            {sortedProducts.length === 0 && (
+            {!loading && sortedProducts.length === 0 && (
               <div className="text-center py-12">
                 <p className="text-gray-500 text-lg">Không tìm thấy sản phẩm nào</p>
                 <p className="text-gray-400 text-sm mt-2">Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm</p>

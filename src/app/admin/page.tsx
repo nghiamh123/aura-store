@@ -19,6 +19,7 @@ import {
   LogOut,
   Shield
 } from 'lucide-react';
+import { API_BASE_URL, apiFetch } from '@/lib/api';
 
 // Mock data for admin dashboard
 const stats = [
@@ -120,6 +121,15 @@ export default function AdminDashboard() {
   const [adminUser, setAdminUser] = useState('');
   const router = useRouter();
 
+  // Products state
+  const [products, setProducts] = useState<Array<{ id: number; name: string; description: string; price: number; category: string; image?: string }>>([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [showCreate, setShowCreate] = useState(false);
+  const [createForm, setCreateForm] = useState({ name: '', description: '', price: '', category: '', image: '' });
+  const [file, setFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
   useEffect(() => {
     // Check if user is authenticated via cookies
     const getCookie = (name: string) => {
@@ -139,6 +149,85 @@ export default function AdminDashboard() {
     
     setAdminUser(user || 'Admin');
   }, [router]);
+
+  useEffect(() => {
+    if (activeTab === 'products') {
+      void loadProducts();
+    }
+  }, [activeTab]);
+
+  async function loadProducts() {
+    try {
+      setLoadingProducts(true);
+      const data = await apiFetch<{ products: typeof products }>('/products');
+      setProducts(data.products);
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Không tải được sản phẩm');
+    } finally {
+      setLoadingProducts(false);
+    }
+  }
+
+  async function uploadToS3(selected: File): Promise<string> {
+    // Ask backend for presigned POST
+    const presign = await apiFetch<{ url: string; fields: Record<string, string>; key: string; finalUrl?: string }>(
+      '/uploads/presign',
+      {
+        method: 'POST',
+        body: JSON.stringify({ filename: selected.name })
+      }
+    );
+
+    const form = new FormData();
+    Object.entries(presign.fields).forEach(([k, v]) => form.append(k, v));
+    // Do NOT set Content-Type header or form field; browser will set multipart boundary automatically
+    form.append('file', selected);
+
+    const res = await fetch(presign.url, { method: 'POST', body: form });
+    if (!res.ok) throw new Error('Upload S3 thất bại');
+
+    const location = presign.finalUrl || res.headers.get('Location') || '';
+    if (!location) throw new Error('Không lấy được URL ảnh sau upload');
+    return location;
+  }
+
+  async function createProduct() {
+    try {
+      setErrorMsg('');
+      setUploading(true);
+
+      let imageUrl = createForm.image.trim() || '';
+      if (!imageUrl && file) {
+        imageUrl = await uploadToS3(file);
+      }
+
+      const body = {
+        name: createForm.name.trim(),
+        description: createForm.description.trim(),
+        price: Number(createForm.price),
+        category: createForm.category.trim(),
+        image: imageUrl || undefined,
+      };
+      await apiFetch('/products', { method: 'POST', body: JSON.stringify(body) });
+      setShowCreate(false);
+      setCreateForm({ name: '', description: '', price: '', category: '', image: '' });
+      setFile(null);
+      await loadProducts();
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Tạo sản phẩm thất bại');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function deleteProduct(id: number) {
+    try {
+      await apiFetch(`/products/${id}`, { method: 'DELETE' });
+      await loadProducts();
+    } catch (e: any) {
+      setErrorMsg(e.message || 'Xóa sản phẩm thất bại');
+    }
+  }
 
   const handleLogout = () => {
     // Clear admin session cookies
@@ -427,12 +516,93 @@ export default function AdminDashboard() {
               <div>
                 <div className="flex items-center justify-between mb-6">
                   <h3 className="text-lg font-semibold text-gray-900">Quản lý sản phẩm</h3>
-                  <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                  <button onClick={() => setShowCreate(true)} className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                     <Plus className="h-4 w-4 mr-2" />
                     Thêm sản phẩm
                   </button>
                 </div>
-                <p className="text-gray-600">Chức năng quản lý sản phẩm sẽ được phát triển...</p>
+
+                {errorMsg && (
+                  <div className="mb-4 text-sm text-red-600">{errorMsg}</div>
+                )}
+
+                {loadingProducts ? (
+                  <div className="text-gray-600">Đang tải sản phẩm...</div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tên</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Giá</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danh mục</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ảnh</th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Thao tác</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {products.map((p) => (
+                          <tr key={p.id} className="hover:bg-gray-50">
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.id}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.name}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.price.toLocaleString()}đ</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.category}</td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {p.image ? (
+                                <img src={p.image as any} alt={p.name} className="h-10 w-10 rounded object-cover border" />
+                              ) : (
+                                <div className="h-10 w-10 rounded bg-gray-100 border" />
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                              <button onClick={() => deleteProduct(p.id)} className="text-red-600 hover:text-red-800 inline-flex items-center">
+                                <Trash2 className="h-4 w-4 mr-1" /> Xóa
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                        {products.length === 0 && (
+                          <tr><td className="px-6 py-4 text-sm text-gray-500" colSpan={5}>Chưa có sản phẩm</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
+                {showCreate && (
+                  <div className="mt-6 bg-white border rounded-xl p-4">
+                    <h4 className="font-semibold mb-4">Thêm sản phẩm</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Tên</label>
+                        <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Giá (đ)</label>
+                        <input type="number" value={createForm.price} onChange={(e) => setCreateForm({ ...createForm, price: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-700 mb-1">Mô tả</label>
+                        <textarea rows={3} value={createForm.description} onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Danh mục</label>
+                        <input value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Ảnh (URL)</label>
+                        <input value={createForm.image} onChange={(e) => setCreateForm({ ...createForm, image: e.target.value })} className="w-full px-3 py-2 border rounded-lg" placeholder="https://..." />
+                        <div className="mt-2 text-xs text-gray-500">Hoặc tải ảnh từ máy bên dưới</div>
+                        <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="mt-2" />
+                      </div>
+                    </div>
+                    <div className="mt-4 flex gap-3 items-center">
+                      <button disabled={uploading} onClick={createProduct} className={`px-4 py-2 rounded-lg text-white ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}>{uploading ? 'Đang tải...' : 'Lưu'}</button>
+                      <button disabled={uploading} onClick={() => setShowCreate(false)} className="px-4 py-2 border border-gray-300 rounded-lg">Hủy</button>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
