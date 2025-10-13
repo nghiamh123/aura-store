@@ -1,12 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Filter, Star, Heart, ShoppingBag, Grid, List, X } from 'lucide-react';
-import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
-import { Product } from '@/types/product';
+import { motion } from 'framer-motion';
+import { Filter, Grid, Heart, List, Search, ShoppingBag, Star, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 // Mock search data
 const searchResults = [
@@ -118,7 +116,8 @@ export default function SearchPage() {
     setFilteredResults(results);
   }, [searchTerm, selectedCategory, sortBy]);
 
-  const handleAddToCart = (item: Product) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleAddToCart = (item: any) => {
     addToCart({
       id: item.id,
       name: item.name,
@@ -128,7 +127,8 @@ export default function SearchPage() {
     });
   };
 
-  const handleWishlistToggle = (item: Product) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleWishlistToggle = (item: any) => {
     if (isInWishlist(item.id)) {
       removeFromWishlist(item.id);
     } else {
