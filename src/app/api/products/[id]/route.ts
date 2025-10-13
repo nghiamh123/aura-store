@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { store } from "@/lib/store";
 import { productUpdateSchema } from "@/lib/validators";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   const id = Number(params.id);
   const product = store.getProduct(id);
@@ -14,7 +15,7 @@ export async function GET(
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   const id = Number(params.id);
   try {
@@ -33,7 +34,7 @@ export async function PATCH(
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: any
 ) {
   const id = Number(params.id);
   const ok = store.deleteProduct(id);
