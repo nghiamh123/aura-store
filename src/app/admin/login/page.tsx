@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Shield, Eye, EyeOff, Lock, User, AlertCircle } from 'lucide-react';
+import Link from 'next/link';
 
 export default function AdminLoginPage() {
   const [formData, setFormData] = useState({
@@ -186,12 +187,12 @@ export default function AdminLoginPage() {
 
           {/* Back to Store */}
           <div className="mt-6 text-center">
-            <a
+            <Link
               href="/"
               className="text-purple-200 hover:text-white text-sm transition-colors"
             >
               ← Quay lại cửa hàng
-            </a>
+            </Link>
           </div>
         </motion.div>
 
