@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     }
     const created = store.createProduct(parsed.data);
     return NextResponse.json({ product: created }, { status: 201 });
-  } catch (err) {
+  } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 }

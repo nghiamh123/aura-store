@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CreditCard, Truck, Shield, Lock, ChevronDown, Plus, Minus, Trash2 } from 'lucide-react';
+import { Shield, Lock, Plus, Minus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock cart data

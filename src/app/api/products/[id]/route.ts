@@ -26,7 +26,7 @@ export async function PATCH(
     const updated = store.updateProduct(id, parsed.data);
     if (!updated) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ product: updated });
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 }

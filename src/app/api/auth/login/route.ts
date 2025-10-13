@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     res.cookies.set("adminAuth", "true", { httpOnly: false, path: "/", maxAge: 60 * 60 * 24 });
     res.cookies.set("adminUser", username, { httpOnly: false, path: "/", maxAge: 60 * 60 * 24 });
     return res;
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 }
