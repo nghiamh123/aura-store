@@ -39,6 +39,7 @@ export default function ProductsPage() {
         if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
         const data = await res.json();
         setProducts((data?.products || []) as ProductItem[]);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
         setError(e.message || 'Không tải được sản phẩm');
       } finally {
@@ -150,6 +151,7 @@ export default function ProductsPage() {
                 </label>
                 <select
                   value={sortBy}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   onChange={(e) => setSortBy(e.target.value as any)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >

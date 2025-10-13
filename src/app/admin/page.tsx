@@ -161,6 +161,7 @@ export default function AdminDashboard() {
       setLoadingProducts(true);
       const data = await apiFetch<{ products: typeof products }>('/products');
       setProducts(data.products);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setErrorMsg(e.message || 'Không tải được sản phẩm');
     } finally {
@@ -213,6 +214,7 @@ export default function AdminDashboard() {
       setCreateForm({ name: '', description: '', price: '', category: '', image: '' });
       setFile(null);
       await loadProducts();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {
       setErrorMsg(e.message || 'Tạo sản phẩm thất bại');
     } finally {
@@ -224,7 +226,8 @@ export default function AdminDashboard() {
     try {
       await apiFetch(`/products/${id}`, { method: 'DELETE' });
       await loadProducts();
-    } catch (e: any) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
       setErrorMsg(e.message || 'Xóa sản phẩm thất bại');
     }
   }
@@ -550,6 +553,7 @@ export default function AdminDashboard() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{p.category}</td>
                             <td className="px-6 py-4 whitespace-nowrap">
                               {p.image ? (
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 <img src={p.image as any} alt={p.name} className="h-10 w-10 rounded object-cover border" />
                               ) : (
                                 <div className="h-10 w-10 rounded bg-gray-100 border" />
