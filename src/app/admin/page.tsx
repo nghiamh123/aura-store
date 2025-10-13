@@ -161,9 +161,9 @@ export default function AdminDashboard() {
       setLoadingProducts(true);
       const data = await apiFetch<{ products: typeof products }>('/products');
       setProducts(data.products);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setErrorMsg(e.message || 'Không tải được sản phẩm');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Không tải được sản phẩm';
+      setErrorMsg(msg);
     } finally {
       setLoadingProducts(false);
     }
@@ -214,9 +214,9 @@ export default function AdminDashboard() {
       setCreateForm({ name: '', description: '', price: '', category: '', image: '' });
       setFile(null);
       await loadProducts();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (e: any) {
-      setErrorMsg(e.message || 'Tạo sản phẩm thất bại');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Tạo sản phẩm thất bại';
+      setErrorMsg(msg);
     } finally {
       setUploading(false);
     }
@@ -226,9 +226,9 @@ export default function AdminDashboard() {
     try {
       await apiFetch(`/products/${id}`, { method: 'DELETE' });
       await loadProducts();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (e: any) {
-      setErrorMsg(e.message || 'Xóa sản phẩm thất bại');
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Xóa sản phẩm thất bại';
+      setErrorMsg(msg);
     }
   }
 
