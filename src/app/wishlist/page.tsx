@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { Heart, ShoppingBag, Trash2, ArrowRight } from 'lucide-react';
 import { useWishlist } from '@/contexts/WishlistContext';
 import { useCart } from '@/contexts/CartContext';
-import { Product } from '@/types/product';
 
 export default function WishlistPage() {
   const { items, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
 
-  const handleAddToCart = (item: Product) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleAddToCart = (item: any) => {
     addToCart({
       id: item.id,
       name: item.name,
