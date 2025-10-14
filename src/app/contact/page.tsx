@@ -81,7 +81,7 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Địa chỉ</h3>
                   <p className="text-gray-600">
-                    123 Đường ABC, Phường 1, Quận 1<br />
+                    Lê Trung Nghĩa, Phường Bảy Hiền,<br />
                     Thành phố Hồ Chí Minh, Việt Nam
                   </p>
                 </div>
@@ -94,8 +94,8 @@ export default function ContactPage() {
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Điện thoại</h3>
                   <p className="text-gray-600">
-                    <a href="tel:+84123456789" className="hover:text-purple-600 transition-colors">
-                      +84 123 456 789
+                    <a href="tel:+84853783578" className="hover:text-purple-600 transition-colors">
+                      +84 853 785 378
                     </a>
                   </p>
                 </div>
@@ -137,12 +137,12 @@ export default function ContactPage() {
                 <a href="#" className="w-10 h-10 bg-purple-600 text-white rounded-lg flex items-center justify-center hover:bg-purple-700 transition-colors">
                   <span className="text-sm font-semibold">f</span>
                 </a>
-                <a href="#" className="w-10 h-10 bg-pink-500 text-white rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors">
+                {/* <a href="#" className="w-10 h-10 bg-pink-500 text-white rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors">
                   <span className="text-sm font-semibold">ig</span>
                 </a>
                 <a href="#" className="w-10 h-10 bg-blue-500 text-white rounded-lg flex items-center justify-center hover:bg-blue-600 transition-colors">
                   <span className="text-sm font-semibold">tw</span>
-                </a>
+                </a> */}
               </div>
             </div>
           </motion.div>
@@ -186,7 +186,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
                       placeholder="Nhập họ và tên"
                     />
                   </div>
@@ -200,7 +200,7 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
                       placeholder="Nhập số điện thoại"
                     />
                   </div>
@@ -217,7 +217,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
                     placeholder="Nhập email"
                   />
                 </div>
@@ -232,7 +232,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
                   >
                     <option value="">Chọn chủ đề</option>
                     <option value="general">Câu hỏi chung</option>
@@ -254,7 +254,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
                     placeholder="Nhập tin nhắn của bạn..."
                   />
                 </div>
@@ -286,7 +286,7 @@ export default function ContactPage() {
               <MapPin className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-500">Bản đồ sẽ được hiển thị ở đây</p>
               <p className="text-sm text-gray-400 mt-2">
-                123 Đường ABC, Phường 1, Quận 1, TP.HCM
+                Lê Trung Nghĩa, Phường Bảy Hiền, TP.HCM
               </p>
             </div>
           </div>
