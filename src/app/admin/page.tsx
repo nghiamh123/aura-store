@@ -245,7 +245,18 @@ export default function AdminDashboard() {
 
   async function deleteProduct(id: number) {
     try {
-      await apiFetch(`/products/${id}`, { method: 'DELETE' });
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${id}`, { 
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Xóa sản phẩm thất bại');
+      }
+      
       await loadProducts();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Xóa sản phẩm thất bại';
