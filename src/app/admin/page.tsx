@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { 
@@ -19,78 +19,9 @@ import {
   LogOut,
   Shield
 } from 'lucide-react';
-import { API_BASE_URL, apiFetch } from '@/lib/api';
+import { apiFetch } from '@/lib/api';
 
-// Mock data for admin dashboard
-const stats = [
-  {
-    title: 'Tổng doanh thu',
-    value: '12,450,000',
-    change: '+12.5%',
-    changeType: 'increase',
-    icon: DollarSign,
-    color: 'text-green-600'
-  },
-  {
-    title: 'Đơn hàng mới',
-    value: '156',
-    change: '+8.2%',
-    changeType: 'increase',
-    icon: ShoppingBag,
-    color: 'text-blue-600'
-  },
-  {
-    title: 'Sản phẩm',
-    value: '89',
-    change: '+3.1%',
-    changeType: 'increase',
-    icon: Package,
-    color: 'text-purple-600'
-  },
-  {
-    title: 'Khách hàng',
-    value: '1,234',
-    change: '-2.1%',
-    changeType: 'decrease',
-    icon: Users,
-    color: 'text-orange-600'
-  }
-];
-
-const recentOrders = [
-  {
-    id: 'AURA-001',
-    customer: 'Nguyễn Văn A',
-    amount: 299000,
-    status: 'delivered',
-    date: '2024-01-15',
-    items: 2
-  },
-  {
-    id: 'AURA-002',
-    customer: 'Trần Thị B',
-    amount: 498000,
-    status: 'processing',
-    date: '2024-01-14',
-    items: 3
-  },
-  {
-    id: 'AURA-003',
-    customer: 'Lê Văn C',
-    amount: 199000,
-    status: 'shipped',
-    date: '2024-01-13',
-    items: 1
-  },
-  {
-    id: 'AURA-004',
-    customer: 'Phạm Thị D',
-    amount: 159000,
-    status: 'confirmed',
-    date: '2024-01-12',
-    items: 1
-  }
-];
+// Helper functions for status display
 
 const topProducts = [
   {
@@ -125,6 +56,25 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Array<{ id: number; name: string; description: string; price: number; category: string; image?: string }>>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
+  
+  // Orders state
+  const [orders, setOrders] = useState<Array<{ 
+    id: string; 
+    userId: string; 
+    total: number; 
+    status: string; 
+    createdAt: string; 
+    items: Array<{ product: { name: string } }> 
+  }>>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  
+  // Stats state
+  const [stats, setStats] = useState({
+    totalRevenue: 0,
+    totalOrders: 0,
+    totalProducts: 0,
+    totalCustomers: 0
+  });
   const [createForm, setCreateForm] = useState({ 
     name: '', 
     description: '', 
@@ -166,13 +116,7 @@ export default function AdminDashboard() {
     setAdminUser(user || 'Admin');
   }, [router]);
 
-  useEffect(() => {
-    if (activeTab === 'products') {
-      void loadProducts();
-    }
-  }, [activeTab]);
-
-  async function loadProducts() {
+  const loadProducts = useCallback(async () => {
     try {
       setLoadingProducts(true);
       const data = await apiFetch<{ products: typeof products }>('/products');
@@ -183,7 +127,42 @@ export default function AdminDashboard() {
     } finally {
       setLoadingProducts(false);
     }
-  }
+  }, []);
+
+  const loadOrders = useCallback(async () => {
+    try {
+      setLoadingOrders(true);
+      const data = await apiFetch<{ orders: typeof orders }>('/orders');
+      setOrders(data.orders);
+      
+      // Calculate stats from real data
+      const totalRevenue = data.orders.reduce((sum, order) => sum + order.total, 0);
+      const totalOrders = data.orders.length;
+      const uniqueCustomers = new Set(data.orders.map(order => order.userId)).size;
+      
+      setStats(prev => ({
+        ...prev,
+        totalRevenue,
+        totalOrders,
+        totalCustomers: uniqueCustomers
+      }));
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Không tải được đơn hàng';
+      setErrorMsg(msg);
+    } finally {
+      setLoadingOrders(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'products') {
+      void loadProducts();
+    } else if (activeTab === 'orders') {
+      void loadOrders();
+    } else if (activeTab === 'overview') {
+      void loadOrders(); // Load orders for stats and recent orders
+    }
+  }, [activeTab, loadProducts, loadOrders]);
 
   async function uploadToS3(selected: File): Promise<string> {
     // Ask backend for presigned POST
@@ -341,7 +320,40 @@ export default function AdminDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {stats.map((stat, index) => (
+          {[
+            {
+              title: 'Tổng doanh thu',
+              value: stats.totalRevenue.toLocaleString(),
+              change: '+12.5%',
+              changeType: 'increase',
+              icon: DollarSign,
+              color: 'text-green-600'
+            },
+            {
+              title: 'Đơn hàng',
+              value: stats.totalOrders.toString(),
+              change: '+8.2%',
+              changeType: 'increase',
+              icon: ShoppingBag,
+              color: 'text-blue-600'
+            },
+            {
+              title: 'Sản phẩm',
+              value: products.length.toString(),
+              change: '+3.1%',
+              changeType: 'increase',
+              icon: Package,
+              color: 'text-purple-600'
+            },
+            {
+              title: 'Khách hàng',
+              value: stats.totalCustomers.toString(),
+              change: '+5.7%',
+              changeType: 'increase',
+              icon: Users,
+              color: 'text-orange-600'
+            }
+          ].map((stat, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 20 }}
@@ -408,7 +420,7 @@ export default function AdminDashboard() {
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4">Đơn hàng gần đây</h3>
                   <div className="space-y-4">
-                    {recentOrders.slice(0, 4).map((order, index) => (
+                    {orders.slice(0, 4).map((order, index) => (
                       <motion.div
                         key={order.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -422,11 +434,11 @@ export default function AdminDashboard() {
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">#{order.id}</p>
-                            <p className="text-sm text-gray-600">{order.customer}</p>
+                            <p className="text-sm text-gray-600">{order.userId === 'guest-user' ? 'Khách hàng' : order.userId}</p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-semibold text-gray-900">{order.amount.toLocaleString()}đ</p>
+                          <p className="font-semibold text-gray-900">{order.total.toLocaleString()}đ</p>
                           <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
                             {getStatusText(order.status)}
                           </span>
@@ -513,7 +525,21 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
-                      {recentOrders.map((order, index) => (
+                      {loadingOrders ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-4 text-center">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                            <p className="text-gray-500 mt-2">Đang tải đơn hàng...</p>
+                          </td>
+                        </tr>
+                      ) : orders.length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-4 text-center text-gray-500">
+                            Chưa có đơn hàng nào
+                          </td>
+                        </tr>
+                      ) : (
+                        orders.map((order, index) => (
                         <motion.tr
                           key={order.id}
                           initial={{ opacity: 0, y: 20 }}
@@ -523,13 +549,13 @@ export default function AdminDashboard() {
                         >
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">#{order.id}</div>
-                            <div className="text-sm text-gray-500">{order.items} sản phẩm</div>
+                            <div className="text-sm text-gray-500">{order.items.length} sản phẩm</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {order.customer}
+                            {order.userId === 'guest-user' ? 'Khách hàng' : order.userId}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {order.amount.toLocaleString()}đ
+                            {order.total.toLocaleString()}đ
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`inline-block px-2 py-1 text-xs font-medium rounded-full ${getStatusColor(order.status)}`}>
@@ -537,7 +563,7 @@ export default function AdminDashboard() {
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {new Date(order.date).toLocaleDateString('vi-VN')}
+                            {new Date(order.createdAt).toLocaleDateString('vi-VN')}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                             <div className="flex items-center space-x-2">
@@ -550,7 +576,8 @@ export default function AdminDashboard() {
                             </div>
                           </td>
                         </motion.tr>
-                      ))}
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>

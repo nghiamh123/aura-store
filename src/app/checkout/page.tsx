@@ -1,33 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Shield, Lock, Plus, Minus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-
-// Mock cart data
-const cartItems = [
-  {
-    id: 1,
-    name: 'Đồng hồ nam sang trọng',
-    price: 299000,
-    originalPrice: 399000,
-    image: '/api/placeholder/100/100',
-    quantity: 1,
-    size: 'M',
-    color: 'Đen'
-  },
-  {
-    id: 2,
-    name: 'Túi xách nữ thời trang',
-    price: 199000,
-    originalPrice: 299000,
-    image: '/api/placeholder/100/100',
-    quantity: 2,
-    size: 'L',
-    color: 'Trắng'
-  }
-];
+import { useCart } from '@/contexts/CartContext';
+import { useRouter } from 'next/navigation';
 
 const paymentMethods = [
   { id: 'cod', name: 'Thanh toán khi nhận hàng', icon: '💰' },
@@ -37,6 +15,9 @@ const paymentMethods = [
 ];
 
 export default function CheckoutPage() {
+  const { items, updateQuantity, removeFromCart, clearCart } = useCart();
+  const router = useRouter();
+  
   const [formData, setFormData] = useState({
     // Customer info
     fullName: '',
@@ -59,6 +40,14 @@ export default function CheckoutPage() {
   });
 
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState('');
+
+  // Redirect if cart is empty
+  useEffect(() => {
+    if (items.length === 0) {
+      router.push('/products');
+    }
+  }, [items.length, router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -69,37 +58,101 @@ export default function CheckoutPage() {
   };
 
   const handleQuantityChange = (id: number, type: 'increase' | 'decrease') => {
-    // Handle quantity change logic
-    console.log('Quantity changed:', { id, type });
+    const item = items.find(item => item.id === id);
+    if (!item) return;
+    
+    if (type === 'increase') {
+      updateQuantity(id, item.quantity + 1);
+    } else if (type === 'decrease' && item.quantity > 1) {
+      updateQuantity(id, item.quantity - 1);
+    }
   };
 
   const handleRemoveItem = (id: number) => {
-    // Handle remove item logic
-    console.log('Item removed:', id);
+    removeFromCart(id);
   };
 
   const calculateSubtotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    return items.reduce((total, item) => total + (item.price * item.quantity), 0);
   };
 
   const calculateDiscount = () => {
-    return cartItems.reduce((total, item) => total + ((item.originalPrice - item.price) * item.quantity), 0);
+    return items.reduce((total, item) => total + ((item.originalPrice - item.price) * item.quantity), 0);
   };
 
   const shippingFee = calculateSubtotal() >= 200000 ? 0 : 30000;
-  const total = calculateSubtotal() + shippingFee;
+  const orderTotal = calculateSubtotal() + shippingFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
+    setError('');
     
-    // Simulate processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsProcessing(false);
-    // Handle order submission
-    console.log('Order submitted:', formData);
+    try {
+      const orderData = {
+        customerInfo: {
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+        },
+        shippingInfo: {
+          address: formData.address,
+          ward: formData.ward,
+          district: formData.district,
+          city: formData.city,
+          note: formData.note,
+        },
+        paymentMethod: formData.paymentMethod,
+        items: items.map(item => ({
+          productId: item.id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        total: orderTotal,
+        shippingFee: shippingFee,
+        discount: calculateDiscount(),
+      };
+
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể tạo đơn hàng');
+      }
+
+      const result = await response.json();
+      
+      // Clear cart after successful order
+      clearCart();
+      
+      // Redirect to order confirmation
+      router.push(`/orders/${result.order.id}`);
+      
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra khi tạo đơn hàng');
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
+  // Show loading or redirect if cart is empty
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Giỏ hàng trống</p>
+          <Link href="/products" className="text-purple-600 hover:text-purple-700">
+            Tiếp tục mua sắm
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -117,6 +170,13 @@ export default function CheckoutPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Error Display */}
+          {error && (
+            <div className="lg:col-span-2 bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-600">{error}</p>
+            </div>
+          )}
+          
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Customer Information */}
@@ -353,10 +413,14 @@ export default function CheckoutPage() {
               
               {/* Cart Items */}
               <div className="space-y-4 mb-6">
-                {cartItems.map((item) => (
+                {items.map((item) => (
                   <div key={item.id} className="flex items-center space-x-3">
                     <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      {item.image ? (
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-lg" />
+                      ) : (
+                        <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 truncate">{item.name}</h4>
@@ -415,7 +479,7 @@ export default function CheckoutPage() {
                 
                 <div className="flex justify-between text-lg font-semibold border-t pt-3">
                   <span>Tổng cộng</span>
-                  <span className="text-purple-600">{total.toLocaleString()}đ</span>
+                  <span className="text-purple-600">{orderTotal.toLocaleString()}đ</span>
                 </div>
               </div>
 
@@ -453,7 +517,7 @@ export default function CheckoutPage() {
                   Đang xử lý...
                 </div>
               ) : (
-                `Đặt hàng • ${total.toLocaleString()}đ`
+                `Đặt hàng • ${orderTotal.toLocaleString()}đ`
               )}
             </motion.button>
           </div>

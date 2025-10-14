@@ -92,13 +92,13 @@ export default function Footer() {
               <div className="flex items-center space-x-3">
                 <MapPin className="h-4 w-4 text-purple-400" />
                 <span className="text-gray-300 text-sm">
-                  123 Đường ABC, Quận 1, TP.HCM
+                  Lê Trung Nghĩa, Phường Bảy Hiền, TP.HCM
                 </span>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 text-purple-400" />
                 <span className="text-gray-300 text-sm">
-                  +84 123 456 789
+                  +84 853 785 378
                 </span>
               </div>
               <div className="flex items-center space-x-3">
@@ -115,7 +115,7 @@ export default function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm">
-              © 2024 Aura. Tất cả quyền được bảo lưu.
+              © 2025 Aura. Tất cả quyền được bảo lưu.
             </p>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="/privacy" className="text-gray-400 hover:text-purple-400 transition-colors text-sm">

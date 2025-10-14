@@ -1,54 +1,48 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Star, Heart, ShoppingBag } from 'lucide-react';
 
-// Mock data for featured products
-const featuredProducts = [
-  {
-    id: 1,
-    name: 'Đồng hồ nam sang trọng',
-    price: '299,000',
-    originalPrice: '399,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.8,
-    reviews: 128,
-    badge: 'Bán chạy'
-  },
-  {
-    id: 2,
-    name: 'Túi xách nữ thời trang',
-    price: '199,000',
-    originalPrice: '299,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.6,
-    reviews: 95,
-    badge: 'Mới'
-  },
-  {
-    id: 3,
-    name: 'Vòng tay trang sức',
-    price: '89,000',
-    originalPrice: '149,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.9,
-    reviews: 203,
-    badge: 'Giảm giá'
-  },
-  {
-    id: 4,
-    name: 'Kính mát thời trang',
-    price: '159,000',
-    originalPrice: '229,000',
-    image: '/api/placeholder/300/300',
-    rating: 4.7,
-    reviews: 76,
-    badge: 'Hot'
-  }
-];
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  originalPrice?: number;
+  image?: string;
+  rating?: number;
+  reviewCount?: number;
+  badge?: string;
+}
 
 export default function Home() {
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        // Take first 4 products as featured
+        setFeaturedProducts(data.products.slice(0, 4));
+      } catch (err) {
+        setError('Không thể tải sản phẩm nổi bật');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -134,7 +128,27 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredProducts.map((product, index) => (
+            {loading ? (
+              // Loading skeleton
+              Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+                  <div className="aspect-square bg-gray-200"></div>
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                    <div className="h-6 bg-gray-200 rounded w-1/2"></div>
+                  </div>
+                </div>
+              ))
+            ) : error ? (
+              <div className="col-span-full text-center py-12">
+                <p className="text-red-600 mb-4">{error}</p>
+                <Link href="/products" className="text-purple-600 hover:text-purple-700">
+                  Xem tất cả sản phẩm
+                </Link>
+              </div>
+            ) : (
+              featuredProducts.map((product, index) => (
               <Link href={`/products/${product.id}`} key={product.id}>
                 <motion.div
                   key={product.id}
@@ -145,7 +159,15 @@ export default function Home() {
                 >
                 <div className="relative">
                   <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
+                    {product.image ? (
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-full object-cover" 
+                      />
+                    ) : (
+                      <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
+                    )}
                   </div>
                   {product.badge && (
                     <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
@@ -168,7 +190,7 @@ export default function Home() {
                         <Star
                           key={i}
                           className={`h-4 w-4 ${
-                            i < Math.floor(product.rating)
+                            i < Math.floor(product.rating || 0)
                               ? 'text-yellow-400 fill-current'
                               : 'text-gray-300'
                           }`}
@@ -176,18 +198,20 @@ export default function Home() {
                       ))}
                     </div>
                     <span className="text-sm text-gray-500 ml-2">
-                      ({product.reviews})
+                      ({product.reviewCount || 0})
                     </span>
                   </div>
                   
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <span className="text-lg font-bold text-purple-600">
-                        {product.price}đ
+                        {product.price.toLocaleString()}đ
                       </span>
-                      <span className="text-sm text-gray-500 line-through">
-                        {product.originalPrice}đ
-                      </span>
+                      {product.originalPrice && product.originalPrice > product.price && (
+                        <span className="text-sm text-gray-500 line-through">
+                          {product.originalPrice.toLocaleString()}đ
+                        </span>
+                      )}
                     </div>
                     <button className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                       <ShoppingBag className="h-4 w-4" />
@@ -196,7 +220,8 @@ export default function Home() {
                 </div>
                 </motion.div>
               </Link>
-            ))}
+              ))
+            )}
           </div>
 
           <div className="text-center mt-12">
