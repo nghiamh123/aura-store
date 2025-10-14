@@ -19,15 +19,15 @@ export default function Footer() {
               giá cả hợp lý.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
+              <a href="https://www.facebook.com/aura.jewelry.2025/" target='_blank' className="text-gray-400 hover:text-purple-400 transition-colors">
                 <Facebook className="h-5 w-5" />
               </a>
               <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
                 <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
+              {/* <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
                 <Twitter className="h-5 w-5" />
-              </a>
+              </a> */}
             </div>
           </div>
 
