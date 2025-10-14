@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight, Star, Heart, ShoppingBag } from 'lucide-react';
+import { useWishlist } from '@/contexts/WishlistContext';
 
 interface Product {
   id: number;
@@ -20,6 +21,23 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Wishlist context
+  const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
+
+  const handleWishlistToggle = async (product: Product) => {
+    if (isInWishlist(product.id)) {
+      await removeFromWishlist(product.id);
+    } else {
+      await addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice || product.price,
+        image: product.image || '',
+      });
+    }
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -174,8 +192,19 @@ export default function Home() {
                       {product.badge}
                     </span>
                   )}
-                  <button className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity">
-                    <Heart className="h-4 w-4 text-gray-600" />
+                  <button 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleWishlistToggle(product);
+                    }}
+                    className={`absolute top-2 right-2 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity ${
+                      isInWishlist(product.id) 
+                        ? 'bg-red-500 text-white' 
+                        : 'bg-white text-gray-600 hover:bg-red-50'
+                    }`}
+                  >
+                    <Heart className={`h-4 w-4 ${isInWishlist(product.id) ? 'fill-current' : ''}`} />
                   </button>
                 </div>
                 

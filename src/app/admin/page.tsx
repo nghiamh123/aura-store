@@ -93,6 +93,7 @@ export default function AdminDashboard() {
     status: 'active'
   });
   const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -187,14 +188,27 @@ export default function AdminDashboard() {
     return location;
   }
 
+  async function uploadMultipleToS3(selectedFiles: File[]): Promise<string[]> {
+    const uploadPromises = selectedFiles.map(file => uploadToS3(file));
+    return Promise.all(uploadPromises);
+  }
+
   async function createProduct() {
     try {
       setErrorMsg('');
       setUploading(true);
 
       let imageUrl = createForm.image.trim() || '';
+      let imageUrls: string[] = [];
+      
+      // Upload single image if provided
       if (!imageUrl && file) {
         imageUrl = await uploadToS3(file);
+      }
+      
+      // Upload multiple images if provided
+      if (files.length > 0) {
+        imageUrls = await uploadMultipleToS3(files);
       }
 
       const body = {
@@ -203,6 +217,7 @@ export default function AdminDashboard() {
         price: Number(createForm.price),
         category: createForm.category.trim(),
         image: imageUrl || undefined,
+        images: imageUrls.length > 0 ? imageUrls : undefined,
         originalPrice: createForm.originalPrice ? Number(createForm.originalPrice) : undefined,
         rating: createForm.rating ? Number(createForm.rating) : undefined,
         reviewCount: createForm.reviewCount ? Number(createForm.reviewCount) : undefined,
@@ -221,19 +236,20 @@ export default function AdminDashboard() {
         description: '', 
         price: '', 
         category: '', 
-        image: '',
-        originalPrice: '',
-        rating: '',
-        reviewCount: '',
-        detailedDescription: '',
-        material: '',
-        size: '',
-        color: '',
-        warranty: '',
-        badge: '',
-        status: 'active'
+        image: '', 
+        originalPrice: '', 
+        rating: '', 
+        reviewCount: '', 
+        detailedDescription: '', 
+        material: '', 
+        size: '', 
+        color: '', 
+        warranty: '', 
+        badge: '', 
+        status: 'active' 
       });
       setFile(null);
+      setFiles([]);
       await loadProducts();
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : 'Tạo sản phẩm thất bại';
@@ -667,7 +683,7 @@ export default function AdminDashboard() {
                         <input 
                           value={createForm.name} 
                           onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="Nhập tên sản phẩm"
                         />
                       </div>
@@ -676,7 +692,7 @@ export default function AdminDashboard() {
                         <select 
                           value={createForm.category} 
                           onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                         >
                           <option value="">Chọn danh mục</option>
                           <option value="watches">Đồng hồ</option>
@@ -696,7 +712,7 @@ export default function AdminDashboard() {
                           type="number" 
                           value={createForm.price} 
                           onChange={(e) => setCreateForm({ ...createForm, price: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="299000"
                         />
                       </div>
@@ -706,7 +722,7 @@ export default function AdminDashboard() {
                           type="number" 
                           value={createForm.originalPrice || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, originalPrice: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="399000"
                         />
                       </div>
@@ -724,7 +740,7 @@ export default function AdminDashboard() {
                           step="0.1"
                           value={createForm.rating || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, rating: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="4.8"
                         />
                       </div>
@@ -734,7 +750,7 @@ export default function AdminDashboard() {
                           type="number" 
                           value={createForm.reviewCount || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, reviewCount: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="128"
                         />
                       </div>
@@ -749,7 +765,7 @@ export default function AdminDashboard() {
                           rows={2} 
                           value={createForm.description} 
                           onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="Mô tả ngắn về sản phẩm..."
                         />
                       </div>
@@ -759,7 +775,7 @@ export default function AdminDashboard() {
                           rows={4} 
                           value={createForm.detailedDescription || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, detailedDescription: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="Mô tả chi tiết về sản phẩm, đặc điểm nổi bật..."
                         />
                       </div>
@@ -773,7 +789,7 @@ export default function AdminDashboard() {
                         <input 
                           value={createForm.material || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, material: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="Thép không gỉ + Da thật"
                         />
                       </div>
@@ -782,7 +798,7 @@ export default function AdminDashboard() {
                         <input 
                           value={createForm.size || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, size: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="42mm"
                         />
                       </div>
@@ -791,7 +807,7 @@ export default function AdminDashboard() {
                         <input 
                           value={createForm.color || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, color: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="Đen, Trắng, Xanh"
                         />
                       </div>
@@ -800,7 +816,7 @@ export default function AdminDashboard() {
                         <input 
                           value={createForm.warranty || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, warranty: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700" 
                           placeholder="24 tháng"
                         />
                       </div>
@@ -814,7 +830,7 @@ export default function AdminDashboard() {
                         <select 
                           value={createForm.badge || ''} 
                           onChange={(e) => setCreateForm({ ...createForm, badge: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                         >
                           <option value="">Không có</option>
                           <option value="Bán chạy">Bán chạy</option>
@@ -828,7 +844,7 @@ export default function AdminDashboard() {
                         <select 
                           value={createForm.status || 'active'} 
                           onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                         >
                           <option value="active">Đang bán</option>
                           <option value="inactive">Ngừng bán</option>
@@ -846,9 +862,33 @@ export default function AdminDashboard() {
                           type="file" 
                           accept="image/*" 
                           onChange={(e) => setFile(e.target.files?.[0] || null)} 
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer" 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700" 
                         />
                         <p className="text-xs text-gray-500 mt-1">Hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 5MB</p>
+                      </div>
+                      
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-700 mb-1">Chọn thêm ảnh (nhiều ảnh)</label>                    
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          multiple
+                          onChange={(e) => setFiles(Array.from(e.target.files || []))} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700" 
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Có thể chọn nhiều ảnh cùng lúc. Hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 5MB mỗi ảnh</p>
+                        {files.length > 0 && (
+                          <div className="mt-2">
+                            <p className="text-sm text-gray-600 mb-2">Đã chọn {files.length} ảnh:</p>
+                            <div className="flex flex-wrap gap-2">
+                              {files.map((file, index) => (
+                                <span key={index} className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs">
+                                  {file.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <div className="mt-6 flex gap-3 items-center">
