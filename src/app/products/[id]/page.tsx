@@ -1,76 +1,39 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { Star, Heart, ShoppingBag, Minus, Plus, Truck, Shield, RotateCcw, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 
-// Mock data for product details
-const productData = {
-  id: 1,
-  name: 'Đồng hồ nam sang trọng',
-  price: '299,000',
-  originalPrice: '399,000',
-  discount: 25,
-  rating: 4.8,
-  reviewCount: 128,
-  badge: 'Bán chạy',
-  category: 'watches',
-  images: [
-    '/api/placeholder/600/600',
-    '/api/placeholder/600/600',
-    '/api/placeholder/600/600',
-    '/api/placeholder/600/600'
-  ],
-  description: `
-    Đồng hồ nam sang trọng với thiết kế hiện đại, phù hợp cho mọi dịp sử dụng. 
-    Được làm từ chất liệu cao cấp, bền bỉ theo thời gian.
-    
-    **Đặc điểm nổi bật:**
-    - Mặt kính cường lực chống trầy xước
-    - Dây đeo da thật mềm mại
-    - Chống nước IPX7
-    - Pin sử dụng lên đến 2 năm
-    - Bảo hành 24 tháng
-  `,
-  specifications: {
-    'Chất liệu': 'Thép không gỉ + Da thật',
-    'Mặt kính': 'Kính cường lực',
-    'Chống nước': 'IPX7',
-    'Kích thước': '42mm',
-    'Pin': 'Pin quartz',
-    'Bảo hành': '24 tháng'
-  },
-  reviews: [
-    {
-      id: 1,
-      user: 'Nguyễn Văn A',
-      rating: 5,
-      date: '2024-01-15',
-      comment: 'Sản phẩm rất đẹp, chất lượng tốt. Giao hàng nhanh, đóng gói cẩn thận.',
-      verified: true
-    },
-    {
-      id: 2,
-      user: 'Trần Thị B',
-      rating: 4,
-      date: '2024-01-10',
-      comment: 'Đồng hồ đẹp, giá hợp lý. Dây đeo hơi cứng lúc đầu nhưng sau vài ngày đã mềm.',
-      verified: true
-    },
-    {
-      id: 3,
-      user: 'Lê Văn C',
-      rating: 5,
-      date: '2024-01-08',
-      comment: 'Rất hài lòng với sản phẩm. Thiết kế sang trọng, phù hợp với công việc văn phòng.',
-      verified: false
-    }
-  ]
-};
+interface Product {
+  id: number;
+  name: string;
+  description: string;
+  detailedDescription?: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  badge?: string;
+  rating?: number;
+  reviewCount?: number;
+  material?: string;
+  size?: string;
+  color?: string;
+  warranty?: string;
+  status: string;
+  image?: string;
+  images?: string[];
+}
 
 export default function ProductDetailPage() {
+  const params = useParams();
+  const productId = params.id as string;
+  
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedSize, setSelectedSize] = useState('');
@@ -79,6 +42,29 @@ export default function ProductDetailPage() {
   
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist, removeFromWishlist } = useWishlist();
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/${productId}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setProduct(data.product);
+      } catch (err) {
+        setError('Không thể tải thông tin sản phẩm');
+        console.error('Error fetching product:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (productId) {
+      fetchProduct();
+    }
+  }, [productId]);
 
   const sizes = ['S', 'M', 'L', 'XL'];
   const colors = [
@@ -97,12 +83,13 @@ export default function ProductDetailPage() {
   };
 
   const handleAddToCart = () => {
+    if (!product) return;
     addToCart({
-      id: productData.id,
-      name: productData.name,
-      price: parseInt(productData.price.replace(/,/g, '')),
-      originalPrice: parseInt(productData.originalPrice.replace(/,/g, '')),
-      image: productData.images[0],
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      originalPrice: product.originalPrice || product.price,
+      image: product.image || product.images?.[0] || '',
     });
   };
 
@@ -113,18 +100,44 @@ export default function ProductDetailPage() {
   };
 
   const handleWishlistToggle = () => {
-    if (isInWishlist(productData.id)) {
-      removeFromWishlist(productData.id);
+    if (!product) return;
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
     } else {
       addToWishlist({
-        id: productData.id,
-        name: productData.name,
-        price: parseInt(productData.price.replace(/,/g, '')),
-        originalPrice: parseInt(productData.originalPrice.replace(/,/g, '')),
-        image: productData.images[0],
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        originalPrice: product.originalPrice || product.price,
+        image: product.image || product.images?.[0] || '',
       });
     }
   };
+
+  // Loading and error states
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải thông tin sản phẩm...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !product) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">{error || 'Không tìm thấy sản phẩm'}</p>
+          <Link href="/products" className="text-purple-600 hover:text-purple-700">
+            ← Quay lại danh sách sản phẩm
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -136,7 +149,7 @@ export default function ProductDetailPage() {
             <span className="text-gray-400">/</span>
             <Link href="/products" className="text-gray-500 hover:text-purple-600">Sản phẩm</Link>
             <span className="text-gray-400">/</span>
-            <span className="text-gray-900">{productData.name}</span>
+            <span className="text-gray-900">{product.name}</span>
           </nav>
         </div>
       </div>
@@ -148,12 +161,20 @@ export default function ProductDetailPage() {
             {/* Main Image */}
             <div className="aspect-square bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="w-full h-full bg-gray-100 flex items-center justify-center relative">
-                <div className="w-32 h-32 bg-gray-200 rounded-lg"></div>
+                {product.image || (product.images && product.images[0]) ? (
+                  <img 
+                    src={product.image || product.images?.[0]} 
+                    alt={product.name} 
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-32 h-32 bg-gray-200 rounded-lg"></div>
+                )}
                 <button 
                   onClick={handleWishlistToggle}
                   className="absolute top-4 left-4 p-2 bg-white rounded-full shadow-md opacity-0 hover:opacity-100 transition-opacity"
                 >
-                  <Heart className={`h-5 w-5 ${isInWishlist(productData.id) ? 'text-red-500 fill-current' : 'text-gray-600'}`} />
+                  <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? 'text-red-500 fill-current' : 'text-gray-600'}`} />
                 </button>
                 <button className="absolute top-4 right-4 p-2 bg-white rounded-full shadow-md opacity-0 hover:opacity-100 transition-opacity">
                   <Share2 className="h-5 w-5 text-gray-600" />
@@ -169,7 +190,7 @@ export default function ProductDetailPage() {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-4 gap-2">
-              {productData.images.map((image, index) => (
+              {(product.images && product.images.length > 0 ? product.images : [product.image]).filter(Boolean).map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -178,7 +199,11 @@ export default function ProductDetailPage() {
                   }`}
                 >
                   <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                    <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    {image ? (
+                      <img src={image} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                    )}
                   </div>
                 </button>
               ))}
@@ -188,53 +213,58 @@ export default function ProductDetailPage() {
           {/* Product Info */}
           <div className="space-y-6">
             {/* Badge */}
-            {productData.badge && (
+            {product.badge && (
               <span className="inline-block bg-purple-600 text-white text-sm font-semibold px-3 py-1 rounded-full">
-                {productData.badge}
+                {product.badge}
               </span>
             )}
 
             {/* Title */}
             <h1 className="text-3xl lg:text-4xl font-playfair font-bold text-gray-900">
-              {productData.name}
+              {product.name}
             </h1>
 
             {/* Rating */}
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-5 w-5 ${
-                      i < Math.floor(productData.rating)
-                        ? 'text-yellow-400 fill-current'
-                        : 'text-gray-300'
-                    }`}
-                  />
-                ))}
+            {product.rating && (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`h-5 w-5 ${
+                        i < Math.floor(product.rating || 0)
+                          ? 'text-yellow-400 fill-current'
+                          : 'text-gray-300'
+                      }`}
+                    />
+                  ))}
+                </div>
+                <span className="text-gray-600">
+                  {product.rating} ({product.reviewCount || 0} đánh giá)
+                </span>
               </div>
-              <span className="text-gray-600">
-                {productData.rating} ({productData.reviewCount} đánh giá)
-              </span>
-            </div>
+            )}
 
             {/* Price */}
             <div className="flex items-center space-x-4">
               <span className="text-3xl font-bold text-purple-600">
-                {productData.price}đ
+                {product.price.toLocaleString()}đ
               </span>
-              <span className="text-xl text-gray-500 line-through">
-                {productData.originalPrice}đ
-              </span>
-              <span className="bg-red-100 text-red-600 text-sm font-semibold px-2 py-1 rounded">
-                -{productData.discount}%
-              </span>
+              {product.originalPrice && (
+                <>
+                  <span className="text-xl text-gray-500 line-through">
+                    {product.originalPrice.toLocaleString()}đ
+                  </span>
+                  <span className="bg-red-100 text-red-600 text-sm font-semibold px-2 py-1 rounded">
+                    -{Math.round((1 - product.price / product.originalPrice) * 100)}%
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Description */}
             <p className="text-gray-600 leading-relaxed">
-              Đồng hồ nam sang trọng với thiết kế hiện đại, phù hợp cho mọi dịp sử dụng. 
-              Được làm từ chất liệu cao cấp, bền bỉ theo thời gian.
+              {product.description}
             </p>
 
             {/* Size Selection */}
@@ -362,58 +392,49 @@ export default function ProductDetailPage() {
               {activeTab === 'description' && (
                 <div className="prose max-w-none">
                   <div className="whitespace-pre-line text-gray-600">
-                    {productData.description}
+                    {product.detailedDescription || product.description}
                   </div>
                 </div>
               )}
 
               {activeTab === 'specifications' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {Object.entries(productData.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-3 border-b border-gray-100">
-                      <span className="font-medium text-gray-900">{key}</span>
-                      <span className="text-gray-600">{value}</span>
+                  {product.material && (
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-900">Chất liệu</span>
+                      <span className="text-gray-600">{product.material}</span>
                     </div>
-                  ))}
+                  )}
+                  {product.size && (
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-900">Kích thước</span>
+                      <span className="text-gray-600">{product.size}</span>
+                    </div>
+                  )}
+                  {product.color && (
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-900">Màu sắc</span>
+                      <span className="text-gray-600">{product.color}</span>
+                    </div>
+                  )}
+                  {product.warranty && (
+                    <div className="flex justify-between py-3 border-b border-gray-100">
+                      <span className="font-medium text-gray-900">Bảo hành</span>
+                      <span className="text-gray-600">{product.warranty}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-3 border-b border-gray-100">
+                    <span className="font-medium text-gray-900">Danh mục</span>
+                    <span className="text-gray-600">{product.category}</span>
+                  </div>
                 </div>
               )}
 
               {activeTab === 'reviews' && (
                 <div className="space-y-6">
-                  {productData.reviews.map((review) => (
-                    <div key={review.id} className="border-b border-gray-100 pb-6 last:border-b-0">
-                      <div className="flex items-start justify-between mb-3">
-                        <div>
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-gray-900">{review.user}</span>
-                            {review.verified && (
-                              <span className="bg-green-100 text-green-600 text-xs font-semibold px-2 py-1 rounded">
-                                Đã mua
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2 mt-1">
-                            <div className="flex items-center">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  className={`h-4 w-4 ${
-                                    i < review.rating
-                                      ? 'text-yellow-400 fill-current'
-                                      : 'text-gray-300'
-                                  }`}
-                                />
-                              ))}
-                            </div>
-                            <span className="text-sm text-gray-500">
-                              {new Date(review.date).toLocaleDateString('vi-VN')}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                      <p className="text-gray-600">{review.comment}</p>
-                    </div>
-                  ))}
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">Chức năng đánh giá sẽ được phát triển trong tương lai</p>
+                  </div>
                 </div>
               )}
             </div>

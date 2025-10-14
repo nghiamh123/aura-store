@@ -125,7 +125,23 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<Array<{ id: number; name: string; description: string; price: number; category: string; image?: string }>>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
-  const [createForm, setCreateForm] = useState({ name: '', description: '', price: '', category: '', image: '' });
+  const [createForm, setCreateForm] = useState({ 
+    name: '', 
+    description: '', 
+    price: '', 
+    category: '', 
+    image: '',
+    originalPrice: '',
+    rating: '',
+    reviewCount: '',
+    detailedDescription: '',
+    material: '',
+    size: '',
+    color: '',
+    warranty: '',
+    badge: '',
+    status: 'active'
+  });
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
@@ -208,10 +224,36 @@ export default function AdminDashboard() {
         price: Number(createForm.price),
         category: createForm.category.trim(),
         image: imageUrl || undefined,
+        originalPrice: createForm.originalPrice ? Number(createForm.originalPrice) : undefined,
+        rating: createForm.rating ? Number(createForm.rating) : undefined,
+        reviewCount: createForm.reviewCount ? Number(createForm.reviewCount) : undefined,
+        detailedDescription: createForm.detailedDescription.trim() || undefined,
+        material: createForm.material.trim() || undefined,
+        size: createForm.size.trim() || undefined,
+        color: createForm.color.trim() || undefined,
+        warranty: createForm.warranty.trim() || undefined,
+        badge: createForm.badge.trim() || undefined,
+        status: createForm.status,
       };
       await apiFetch('/products', { method: 'POST', body: JSON.stringify(body) });
       setShowCreate(false);
-      setCreateForm({ name: '', description: '', price: '', category: '', image: '' });
+      setCreateForm({ 
+        name: '', 
+        description: '', 
+        price: '', 
+        category: '', 
+        image: '',
+        originalPrice: '',
+        rating: '',
+        reviewCount: '',
+        detailedDescription: '',
+        material: '',
+        size: '',
+        color: '',
+        warranty: '',
+        badge: '',
+        status: 'active'
+      });
       setFile(null);
       await loadProducts();
     } catch (e: unknown) {
@@ -280,10 +322,10 @@ export default function AdminDashboard() {
                   <Shield className="h-4 w-4" />
                   <span>Xin chào, {adminUser}</span>
                 </div>
-                <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                {/* <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
                   <Plus className="h-4 w-4 mr-2" />
                   Thêm sản phẩm
-                </button>
+                </button> */}
                 <button
                   onClick={handleLogout}
                   className="flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
@@ -575,35 +617,217 @@ export default function AdminDashboard() {
                 )}
 
                 {showCreate && (
-                  <div className="mt-6 bg-white border rounded-xl p-4">
-                    <h4 className="font-semibold mb-4">Thêm sản phẩm</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm text-gray-700 mb-1">Tên</label>
-                        <input value={createForm.name} onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                  <div className="mt-6 bg-white border rounded-xl p-6">
+                    <h4 className="font-semibold mb-6 text-gray-800">Thêm sản phẩm</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Thông tin cơ bản */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Thông tin cơ bản</h5>
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-700 mb-1">Giá (đ)</label>
-                        <input type="number" value={createForm.price} onChange={(e) => setCreateForm({ ...createForm, price: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                        <label className="block text-sm text-gray-700 mb-1">Tên sản phẩm *</label>
+                        <input 
+                          value={createForm.name} 
+                          onChange={(e) => setCreateForm({ ...createForm, name: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="Nhập tên sản phẩm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Danh mục *</label>
+                        <select 
+                          value={createForm.category} 
+                          onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        >
+                          <option value="">Chọn danh mục</option>
+                          <option value="watches">Đồng hồ</option>
+                          <option value="jewelry">Trang sức</option>
+                          <option value="bags">Túi xách</option>
+                          <option value="accessories">Phụ kiện</option>
+                        </select>
+                      </div>
+                      
+                      {/* Giá cả */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Giá cả</h5>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Giá bán (đ) *</label>
+                        <input 
+                          type="number" 
+                          value={createForm.price} 
+                          onChange={(e) => setCreateForm({ ...createForm, price: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="299000"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Giá gốc (đ)</label>
+                        <input 
+                          type="number" 
+                          value={createForm.originalPrice || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, originalPrice: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="399000"
+                        />
+                      </div>
+                      
+                      {/* Đánh giá */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Đánh giá</h5>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Điểm đánh giá (1-5)</label>
+                        <input 
+                          type="number" 
+                          min="1" 
+                          max="5" 
+                          step="0.1"
+                          value={createForm.rating || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, rating: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="4.8"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Số đánh giá</label>
+                        <input 
+                          type="number" 
+                          value={createForm.reviewCount || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, reviewCount: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="128"
+                        />
+                      </div>
+                      
+                      {/* Mô tả */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Mô tả</h5>
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm text-gray-700 mb-1">Mô tả</label>
-                        <textarea rows={3} value={createForm.description} onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                        <label className="block text-sm text-gray-700 mb-1">Mô tả ngắn</label>
+                        <textarea 
+                          rows={2} 
+                          value={createForm.description} 
+                          onChange={(e) => setCreateForm({ ...createForm, description: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="Mô tả ngắn về sản phẩm..."
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-700 mb-1">Mô tả chi tiết</label>
+                        <textarea 
+                          rows={4} 
+                          value={createForm.detailedDescription || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, detailedDescription: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="Mô tả chi tiết về sản phẩm, đặc điểm nổi bật..."
+                        />
+                      </div>
+                      
+                      {/* Thông số kỹ thuật */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Thông số kỹ thuật</h5>
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-700 mb-1">Danh mục</label>
-                        <input value={createForm.category} onChange={(e) => setCreateForm({ ...createForm, category: e.target.value })} className="w-full px-3 py-2 border rounded-lg" />
+                        <label className="block text-sm text-gray-700 mb-1">Chất liệu</label>
+                        <input 
+                          value={createForm.material || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, material: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="Thép không gỉ + Da thật"
+                        />
                       </div>
                       <div>
-                        <label className="block text-sm text-gray-700 mb-1">Ảnh (URL)</label>
-                        <input value={createForm.image} onChange={(e) => setCreateForm({ ...createForm, image: e.target.value })} className="w-full px-3 py-2 border rounded-lg" placeholder="https://..." />
-                        <div className="mt-2 text-xs text-gray-500">Hoặc tải ảnh từ máy bên dưới</div>
-                        <input type="file" accept="image/*" onChange={(e) => setFile(e.target.files?.[0] || null)} className="mt-2" />
+                        <label className="block text-sm text-gray-700 mb-1">Kích thước</label>
+                        <input 
+                          value={createForm.size || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, size: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="42mm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Màu sắc</label>
+                        <input 
+                          value={createForm.color || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, color: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="Đen, Trắng, Xanh"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Bảo hành</label>
+                        <input 
+                          value={createForm.warranty || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, warranty: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent" 
+                          placeholder="24 tháng"
+                        />
+                      </div>
+                      
+                      {/* Badge và trạng thái */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Hiển thị</h5>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Badge</label>
+                        <select 
+                          value={createForm.badge || ''} 
+                          onChange={(e) => setCreateForm({ ...createForm, badge: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        >
+                          <option value="">Không có</option>
+                          <option value="Bán chạy">Bán chạy</option>
+                          <option value="Mới">Mới</option>
+                          <option value="Giảm giá">Giảm giá</option>
+                          <option value="Hot">Hot</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm text-gray-700 mb-1">Trạng thái</label>
+                        <select 
+                          value={createForm.status || 'active'} 
+                          onChange={(e) => setCreateForm({ ...createForm, status: e.target.value })} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        >
+                          <option value="active">Đang bán</option>
+                          <option value="inactive">Ngừng bán</option>
+                          <option value="draft">Bản nháp</option>
+                        </select>
+                      </div>
+                      
+                      {/* Ảnh sản phẩm */}
+                      <div className="md:col-span-2">
+                        <h5 className="font-medium text-gray-700 mb-3">Ảnh sản phẩm</h5>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm text-gray-700 mb-1">Chọn ảnh chính</label>                    
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={(e) => setFile(e.target.files?.[0] || null)} 
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer" 
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 5MB</p>
                       </div>
                     </div>
-                    <div className="mt-4 flex gap-3 items-center">
-                      <button disabled={uploading} onClick={createProduct} className={`px-4 py-2 rounded-lg text-white ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}>{uploading ? 'Đang tải...' : 'Lưu'}</button>
-                      <button disabled={uploading} onClick={() => setShowCreate(false)} className="px-4 py-2 border border-gray-300 rounded-lg">Hủy</button>
+                    <div className="mt-6 flex gap-3 items-center">
+                      <button 
+                        disabled={uploading} 
+                        onClick={createProduct} 
+                        className={`px-6 py-2 rounded-lg text-white font-medium ${uploading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}
+                      >
+                        {uploading ? 'Đang tải...' : 'Tạo sản phẩm'}
+                      </button>
+                      <button 
+                        disabled={uploading} 
+                        onClick={() => setShowCreate(false)} 
+                        className="px-6 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50"
+                      >
+                        Hủy
+                      </button>
                     </div>
                   </div>
                 )}
