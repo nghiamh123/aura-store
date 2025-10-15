@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, User, Phone, ArrowRight } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function RegisterPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -18,6 +21,7 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -82,14 +86,40 @@ export default function RegisterPage() {
     }
 
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsLoading(false);
-    
-    // Handle registration logic here
-    console.log('Registration data:', formData);
+    setSubmitError('');
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+        })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'Đăng ký thất bại');
+      }
+
+      // If there are guest orders with same email, link them
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/link-guest-to-account`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch {}
+
+      const redirect = searchParams.get('redirect') || '/profile';
+      router.push(redirect);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Đăng ký thất bại');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -125,6 +155,11 @@ export default function RegisterPage() {
           className="bg-white py-8 px-6 shadow-lg rounded-2xl"
         >
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {submitError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">
+                {submitError}
+              </div>
+            )}
             {/* Full Name */}
             <div>
               <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">

@@ -1,20 +1,65 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { User, Edit, Save, X, Heart, ShoppingBag, Package, Settings, Lock, Shield, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [formData, setFormData] = useState({
-    fullName: 'Nguyễn Văn A',
-    email: 'nguyenvana@email.com',
-    phone: '0123456789',
-    address: '123 Đường ABC, Phường 1, Quận 1, TP.HCM',
-    dateOfBirth: '1995-01-01',
-    gender: 'male'
+    fullName: '',
+    email: '',
+    phone: '',
+    address: '',
+    ward: '',
+    district: '',
+    city: '',
+    country: '',
+    postalCode: '',
+    dateOfBirth: '',
+    gender: 'OTHER',
+    avatar: ''
   });
+
+  // Auth guard: require login; load profile
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, { credentials: 'include' });
+        if (res.status === 401) {
+          router.push('/auth/login?redirect=/profile');
+          return;
+        }
+        const data = await res.json();
+        const u = data.user;
+        setFormData({
+          fullName: u.name || '',
+          email: u.email || '',
+          phone: u.phone || '',
+          address: u.address || '',
+          ward: u.ward || '',
+          district: u.district || '',
+          city: u.city || '',
+          country: u.country || '',
+          postalCode: u.postalCode || '',
+          dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().slice(0,10) : '',
+          gender: u.gender || 'OTHER',
+          avatar: u.avatar || ''
+        });
+      } catch (e) {
+        setError('Không thể tải hồ sơ người dùng');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [router]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -24,10 +69,53 @@ export default function ProfilePage() {
     }));
   };
 
-  const handleSave = () => {
-    // Handle save logic
-    console.log('Profile updated:', formData);
-    setIsEditing(false);
+  const handleSave = async () => {
+    try {
+      setError('');
+      const body: any = {
+        name: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        address: formData.address,
+        ward: formData.ward,
+        district: formData.district,
+        city: formData.city,
+        country: formData.country,
+        postalCode: formData.postalCode,
+        gender: formData.gender,
+      };
+      if (formData.dateOfBirth) body.dateOfBirth = new Date(formData.dateOfBirth).toISOString();
+      if (formData.avatar) body.avatar = formData.avatar;
+
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Cập nhật hồ sơ thất bại');
+      // sync back returned values
+      const u = data.user;
+      setFormData(prev => ({
+        ...prev,
+        fullName: u.name || prev.fullName,
+        email: u.email || prev.email,
+        phone: u.phone || prev.phone,
+        address: u.address || prev.address,
+        ward: u.ward || prev.ward,
+        district: u.district || prev.district,
+        city: u.city || prev.city,
+        country: u.country || prev.country,
+        postalCode: u.postalCode || prev.postalCode,
+        dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().slice(0,10) : prev.dateOfBirth,
+        gender: u.gender || prev.gender,
+        avatar: u.avatar || prev.avatar
+      }));
+      setIsEditing(false);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Cập nhật hồ sơ thất bại');
+    }
   };
 
   const handleCancel = () => {
@@ -40,6 +128,17 @@ export default function ProfilePage() {
     { label: 'Yêu thích', value: '8', icon: Heart, color: 'text-pink-600' },
     { label: 'Đã mua', value: '24', icon: ShoppingBag, color: 'text-green-600' }
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Đang tải hồ sơ...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,7 +168,7 @@ export default function ProfilePage() {
                 <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <User className="h-12 w-12 text-purple-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">{formData.fullName}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">{formData.fullName || 'Khách hàng'}</h2>
                 <p className="text-gray-600">{formData.email}</p>
               </div>
 
@@ -148,7 +247,11 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <form className="space-y-6">
+              {error && (
+                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">{error}</div>
+              )}
+
+              <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); void handleSave(); }}>
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -217,6 +320,79 @@ export default function ProfilePage() {
                   />
                 </div>
 
+                {/* Ward / District / City */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Phường/Xã</label>
+                    <input
+                      type="text"
+                      name="ward"
+                      value={formData.ward}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Quận/Huyện</label>
+                    <input
+                      type="text"
+                      name="district"
+                      value={formData.district}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tỉnh/Thành phố</label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    />
+                  </div>
+                </div>
+
+                {/* Country / Postal */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Quốc gia</label>
+                    <input
+                      type="text"
+                      name="country"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Mã bưu chính</label>
+                    <input
+                      type="text"
+                      name="postalCode"
+                      value={formData.postalCode}
+                      onChange={handleInputChange}
+                      disabled={!isEditing}
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Date of Birth */}
                   <div>
@@ -249,9 +425,9 @@ export default function ProfilePage() {
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     >
-                      <option value="male">Nam</option>
-                      <option value="female">Nữ</option>
-                      <option value="other">Khác</option>
+                      <option value="MALE">Nam</option>
+                      <option value="FEMALE">Nữ</option>
+                      <option value="OTHER">Khác</option>
                     </select>
                   </div>
                 </div>

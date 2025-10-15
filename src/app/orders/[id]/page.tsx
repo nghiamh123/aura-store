@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { CheckCircle, Package, Truck, Clock, MapPin, Phone, Mail } from 'lucide-react';
+import { CheckCircle, Package, Truck, Clock, MapPin, Phone, Mail, Copy } from 'lucide-react';
 import Link from 'next/link';
 
 interface OrderItem {
@@ -20,6 +20,7 @@ interface OrderItem {
 
 interface Order {
   id: string;
+  orderNumber: string;
   userId: string;
   total: number;
   status: string;
@@ -34,6 +35,7 @@ export default function OrderConfirmationPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchOrder = async () => {
@@ -133,9 +135,25 @@ export default function OrderConfirmationPage() {
             <p className="text-gray-600 mb-4">
               Đơn hàng của bạn đã được xác nhận và đang được xử lý.
             </p>
-            <div className="bg-gray-50 rounded-lg p-4 inline-block">
-              <p className="text-sm text-gray-600">Mã đơn hàng</p>
-              <p className="text-lg font-semibold text-gray-900">{order.id}</p>
+            <div className="bg-gray-50 rounded-lg p-4 inline-flex items-center gap-3">
+              <div>
+                <p className="text-sm text-gray-600">Mã đơn hàng</p>
+                <p className="text-lg font-semibold text-gray-900 font-mono">{order.orderNumber || order.id}</p>
+              </div>
+              <button
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(order.orderNumber || order.id);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 1500);
+                  } catch {}
+                }}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-md bg-white border border-gray-200 hover:bg-gray-100 text-gray-700"
+                title="Sao chép mã đơn hàng"
+              >
+                <Copy className="h-4 w-4" />
+                <span>{copied ? 'Đã sao chép' : 'Sao chép'}</span>
+              </button>
             </div>
           </div>
         </motion.div>
@@ -270,6 +288,12 @@ export default function OrderConfirmationPage() {
             className="px-6 py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors text-center"
           >
             Tiếp tục mua sắm
+          </Link>
+          <Link
+            href="/track"
+            className="px-6 py-3 bg-pink-600 text-white rounded-lg font-medium hover:bg-pink-700 transition-colors text-center"
+          >
+            Theo dõi đơn hàng
           </Link>
           <Link
             href="/orders"

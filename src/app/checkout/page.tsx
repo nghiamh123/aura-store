@@ -18,6 +18,18 @@ export default function CheckoutPage() {
   const { items, updateQuantity, removeFromCart, clearCart } = useCart();
   const router = useRouter();
   
+  // Auth state
+  const [user, setUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authError, setAuthError] = useState('');
+  const [authForm, setAuthForm] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
+
   const [formData, setFormData] = useState({
     // Customer info
     fullName: '',
@@ -49,6 +61,38 @@ export default function CheckoutPage() {
     }
   }, [items.length, router]);
 
+  // Auth guard: require login to access checkout
+  useEffect(() => {
+    const guard = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, { credentials: 'include' });
+        if (res.status === 401) {
+          router.push('/auth/login?redirect=/checkout');
+        }
+      } catch {
+        // if API error, keep page; optional: route to login
+      }
+    };
+    void guard();
+  }, [router]);
+
+  // Detect logged-in customer
+  useEffect(() => {
+    const fetchMe = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, {
+          credentials: 'include'
+        });
+        if (!res.ok) return; // guest
+        const data = await res.json();
+        setUser(data.user);
+      } catch {
+        // ignore
+      }
+    };
+    fetchMe();
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
@@ -65,6 +109,55 @@ export default function CheckoutPage() {
       updateQuantity(id, item.quantity + 1);
     } else if (type === 'decrease' && item.quantity > 1) {
       updateQuantity(id, item.quantity - 1);
+    }
+  };
+
+  const handleAuthInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setAuthForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const submitLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: authForm.email, password: authForm.password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Đăng nhập thất bại');
+      setUser(data.user);
+      setShowAuth(false);
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const submitRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthLoading(true);
+    setAuthError('');
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ name: authForm.name, email: authForm.email, password: authForm.password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Đăng ký thất bại');
+      setUser(data.user);
+      setShowAuth(false);
+    } catch (err) {
+      setAuthError(err instanceof Error ? err.message : 'Đăng ký thất bại');
+    } finally {
+      setAuthLoading(false);
     }
   };
 
@@ -118,6 +211,7 @@ export default function CheckoutPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(orderData),
       });
 
@@ -130,6 +224,14 @@ export default function CheckoutPage() {
       // Clear cart after successful order
       clearCart();
       
+      // If user just logged in or registered during checkout, attempt to link guest orders
+      try {
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/link-guest-to-account`, {
+          method: 'POST',
+          credentials: 'include'
+        });
+      } catch {}
+
       // Redirect to order confirmation
       router.push(`/orders/${result.order.id}`);
       
@@ -169,6 +271,36 @@ export default function CheckoutPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Auth prompt */}
+        <div className="mb-6">
+          {user ? (
+            <div className="flex items-center justify-between bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-lg">
+              <p>
+                Đang đăng nhập với tài khoản <span className="font-medium">{user.name}</span> ({user.email}). Đơn hàng sẽ được lưu vào tài khoản của bạn.
+              </p>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded-lg">
+              <p>Đăng nhập để lưu lịch sử đơn hàng và theo dõi dễ dàng hơn.</p>
+              <div className="space-x-2">
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('login'); setShowAuth(true); }}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Đăng nhập
+                </button>
+                <button
+                  type="button"
+                  onClick={() => { setAuthMode('register'); setShowAuth(true); }}
+                  className="px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100"
+                >
+                  Đăng ký
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Error Display */}
           {error && (
@@ -198,7 +330,7 @@ export default function CheckoutPage() {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     placeholder="Nhập họ và tên"
                   />
                 </div>
@@ -213,7 +345,7 @@ export default function CheckoutPage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     placeholder="Nhập số điện thoại"
                   />
                 </div>
@@ -228,7 +360,7 @@ export default function CheckoutPage() {
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                   placeholder="Nhập email (tùy chọn)"
                 />
               </div>
@@ -254,7 +386,7 @@ export default function CheckoutPage() {
                     value={formData.address}
                     onChange={handleInputChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     placeholder="Số nhà, tên đường"
                   />
                 </div>
@@ -269,7 +401,7 @@ export default function CheckoutPage() {
                       value={formData.ward}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     >
                       <option value="">Chọn phường/xã</option>
                       <option value="phuong-1">Phường 1</option>
@@ -286,7 +418,7 @@ export default function CheckoutPage() {
                       value={formData.district}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     >
                       <option value="">Chọn quận/huyện</option>
                       <option value="quan-1">Quận 1</option>
@@ -303,7 +435,7 @@ export default function CheckoutPage() {
                       value={formData.city}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     >
                       <option value="">Chọn tỉnh/thành phố</option>
                       <option value="hcm">TP. Hồ Chí Minh</option>
@@ -321,7 +453,7 @@ export default function CheckoutPage() {
                     value={formData.note}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
                     placeholder="Ghi chú cho đơn hàng (tùy chọn)"
                   />
                 </div>
@@ -523,6 +655,67 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+
+      {/* Auth Modal */}
+      {showAuth && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">{authMode === 'login' ? 'Đăng nhập' : 'Đăng ký'}</h3>
+              <button onClick={() => setShowAuth(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+            </div>
+
+            {authError && (
+              <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">{authError}</div>
+            )}
+
+            <form onSubmit={authMode === 'login' ? submitLogin : submitRegister} className="space-y-4">
+              {authMode === 'register' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Họ và tên</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={authForm.name}
+                    onChange={handleAuthInput}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  value={authForm.email}
+                  onChange={handleAuthInput}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                <input
+                  type="password"
+                  name="password"
+                  value={authForm.password}
+                  onChange={handleAuthInput}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={authLoading}
+                className={`w-full py-3 rounded-lg font-semibold text-white ${authLoading ? 'bg-gray-400' : 'bg-purple-600 hover:bg-purple-700'}`}
+              >
+                {authLoading ? 'Đang xử lý...' : authMode === 'login' ? 'Đăng nhập' : 'Đăng ký'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, ShoppingBag, Search, Heart } from 'lucide-react';
+import { Menu, X, ShoppingBag, Search, Heart, Package, User } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { itemCount } = useCart();
   const { itemCount: wishlistCount } = useWishlist();
 
@@ -50,6 +51,9 @@ export default function Header() {
             <button className="p-2 text-gray-700 hover:text-purple-600 transition-colors">
               <Search className="h-5 w-5" />
             </button>
+            <Link href="/track" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Theo dõi đơn hàng">
+              <Package className="h-5 w-5" />
+            </Link>
             <Link href="/wishlist" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
@@ -66,6 +70,36 @@ export default function Header() {
                 </span>
               )}
             </Link>
+            {/* User menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                className="p-2 text-gray-700 hover:text-purple-600 transition-colors"
+                aria-haspopup="menu"
+                aria-expanded={isUserMenuOpen}
+                title="Tài khoản"
+              >
+                <User className="h-5 w-5" />
+              </button>
+              {isUserMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg py-1 z-50">
+                  <Link
+                    href="/profile"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
+                    Thông tin tài khoản
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    onClick={() => setIsUserMenuOpen(false)}
+                  >
+                    Đơn hàng của tôi
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -97,6 +131,9 @@ export default function Header() {
                 <button className="p-2 text-gray-700 hover:text-purple-600 transition-colors">
                   <Search className="h-5 w-5" />
                 </button>
+                <Link href="/track" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Theo dõi đơn hàng">
+                  <Package className="h-5 w-5" />
+                </Link>
                 <Link href="/wishlist" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
                   <Heart className="h-5 w-5" />
                   {wishlistCount > 0 && (
@@ -112,6 +149,9 @@ export default function Header() {
                       {itemCount}
                     </span>
                   )}
+                </Link>
+                <Link href="/profile" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Tài khoản" onClick={() => setIsMenuOpen(false)}>
+                  <User className="h-5 w-5" />
                 </Link>
               </div>
             </div>
