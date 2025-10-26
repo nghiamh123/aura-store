@@ -3,11 +3,17 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --primary: hsl(47, 100%, 60%);
+  --secondary: hsl(40, 92%, 58%);
+  --bg-primary: hsl(26, 13%, 80%);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-bg-primary: var(--bg-primary);
   --font-sans: var(--font-inter);
   --font-mono: var(--font-playfair);
 }
@@ -61,4 +67,9 @@ html {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #a8a8a8;
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-rgb: 255, 255, 255;
 }

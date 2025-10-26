@@ -1,21 +1,24 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Heart, ShoppingBag, Trash2, ArrowRight, Star } from 'lucide-react';
-import { useWishlist } from '@/contexts/WishlistContext';
-import { useCart } from '@/contexts/CartContext';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Heart, ShoppingBag, Trash2, ArrowRight, Star } from "lucide-react";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { useCart } from "@/contexts/CartContext";
 
 export default function WishlistPage() {
-  const { items, removeFromWishlist, clearWishlist, loading, error } = useWishlist();
+  const { items, removeFromWishlist, clearWishlist, loading, error } =
+    useWishlist();
   const { addToCart } = useCart();
-  const [actionLoading, setActionLoading] = useState<{ [key: number]: boolean }>({});
+  const [actionLoading, setActionLoading] = useState<{
+    [key: number]: boolean;
+  }>({});
   const [clearAllLoading, setClearAllLoading] = useState(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleAddToCart = async (item: any) => {
-    setActionLoading(prev => ({ ...prev, [item.id]: true }));
+    setActionLoading((prev) => ({ ...prev, [item.id]: true }));
     try {
       addToCart({
         id: item.id,
@@ -25,16 +28,16 @@ export default function WishlistPage() {
         image: item.image,
       });
     } finally {
-      setActionLoading(prev => ({ ...prev, [item.id]: false }));
+      setActionLoading((prev) => ({ ...prev, [item.id]: false }));
     }
   };
 
   const handleRemoveFromWishlist = async (id: number) => {
-    setActionLoading(prev => ({ ...prev, [id]: true }));
+    setActionLoading((prev) => ({ ...prev, [id]: true }));
     try {
       await removeFromWishlist(id);
     } finally {
-      setActionLoading(prev => ({ ...prev, [id]: false }));
+      setActionLoading((prev) => ({ ...prev, [id]: false }));
     }
   };
 
@@ -62,7 +65,10 @@ export default function WishlistPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+              <div
+                key={index}
+                className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse"
+              >
                 <div className="aspect-square bg-gray-200"></div>
                 <div className="p-4">
                   <div className="h-4 bg-gray-200 rounded mb-2"></div>
@@ -83,7 +89,10 @@ export default function WishlistPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">{error}</p>
-          <Link href="/products" className="text-purple-600 hover:text-purple-700">
+          <Link
+            href="/products"
+            className="text-purple-600 hover:text-purple-700"
+          >
             Tiếp tục mua sắm
           </Link>
         </div>
@@ -113,8 +122,8 @@ export default function WishlistPage() {
               Danh sách yêu thích trống
             </h2>
             <p className="text-gray-600 mb-8 max-w-md mx-auto">
-              Bạn chưa có sản phẩm nào trong danh sách yêu thích. 
-              Hãy khám phá các sản phẩm và thêm vào danh sách yêu thích của bạn.
+              Bạn chưa có sản phẩm nào trong danh sách yêu thích. Hãy khám phá
+              các sản phẩm và thêm vào danh sách yêu thích của bạn.
             </p>
             <Link
               href="/products"
@@ -170,16 +179,16 @@ export default function WishlistPage() {
               <div className="relative">
                 <div className="aspect-square bg-gray-100 flex items-center justify-center relative">
                   {item.image ? (
-                    <img 
-                      src={item.image} 
-                      alt={item.name} 
-                      className="w-full h-full object-cover" 
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
                   )}
                   {item.badge && (
-                    <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                    <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -203,18 +212,18 @@ export default function WishlistPage() {
                   <Heart className="h-4 w-4 text-red-500 fill-current" />
                 </button>
               </div>
-              
+
               <div className="p-4">
                 <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                   {item.name}
                 </h3>
-                
+
                 {item.description && (
                   <p className="text-sm text-gray-600 mb-2 line-clamp-2">
                     {item.description}
                   </p>
                 )}
-                
+
                 {(item.rating || item.reviewCount) && (
                   <div className="flex items-center mb-2">
                     <div className="flex items-center">
@@ -223,8 +232,8 @@ export default function WishlistPage() {
                           key={i}
                           className={`h-4 w-4 ${
                             i < Math.floor(item.rating || 0)
-                              ? 'text-yellow-400 fill-current'
-                              : 'text-gray-300'
+                              ? "text-yellow-400 fill-current"
+                              : "text-gray-300"
                           }`}
                         />
                       ))}
@@ -234,10 +243,10 @@ export default function WishlistPage() {
                     </span>
                   </div>
                 )}
-                
+
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
-                    <span className="text-lg font-bold text-purple-600">
+                    <span className="text-lg font-bold text-black">
                       {item.price.toLocaleString()}đ
                     </span>
                     {item.originalPrice && item.originalPrice > item.price && (
@@ -247,12 +256,12 @@ export default function WishlistPage() {
                     )}
                   </div>
                 </div>
-                
+
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handleAddToCart(item)}
                     disabled={actionLoading[item.id]}
-                    className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-purple-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-amber-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-amber-600 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                   >
                     {actionLoading[item.id] ? (
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
@@ -263,7 +272,7 @@ export default function WishlistPage() {
                   </button>
                   <Link
                     href={`/products/${item.id}`}
-                    className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="p-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50 transition-colors"
                   >
                     <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -277,14 +286,14 @@ export default function WishlistPage() {
         <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/products"
-            className="inline-flex items-center px-6 py-3 border-2 border-purple-600 text-purple-600 font-semibold rounded-lg hover:bg-purple-600 hover:text-white transition-colors"
+            className="inline-flex items-center px-6 py-3 border-2 border-amber-500 text-amber-500 font-semibold rounded-lg hover:bg-amber-500 hover:text-white transition-colors"
           >
             Tiếp tục mua sắm
           </Link>
           <button
             onClick={handleClearAll}
             disabled={clearAllLoading}
-            className="inline-flex items-center px-6 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center px-6 py-3 bg-red-600/70 text-white font-semibold rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
             {clearAllLoading && (
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>

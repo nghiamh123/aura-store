@@ -1,10 +1,18 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { Menu, X, ShoppingBag, Search, Heart, Package, User } from 'lucide-react';
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
+import { useState } from "react";
+import Link from "next/link";
+import {
+  Menu,
+  X,
+  ShoppingBag,
+  Search,
+  Heart,
+  Package,
+  User,
+} from "lucide-react";
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,12 +21,11 @@ export default function Header() {
   const { itemCount: wishlistCount } = useWishlist();
 
   const navigation = [
-    { name: 'Trang chủ', href: '/' },
-    { name: 'Sản phẩm', href: '/products' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Liên hệ', href: '/contact' },
+    { name: "Trang chủ", href: "/" },
+    { name: "Sản phẩm", href: "/products" },
+    { name: "Blog", href: "/blog" },
+    { name: "Liên hệ", href: "/contact" },
   ];
-
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -27,7 +34,7 @@ export default function Header() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="flex items-center">
-              <span className="text-2xl font-playfair font-bold text-purple-600">
+              <span className="text-2xl font-playfair font-bold text-primary">
                 Aura
               </span>
             </Link>
@@ -39,7 +46,7 @@ export default function Header() {
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-gray-700 hover:text-purple-600 px-3 py-2 text-sm font-medium transition-colors duration-200"
+                className="text-gray-700 hover:text-primary px-3 py-2 text-sm font-medium transition-colors duration-200"
               >
                 {item.name}
               </Link>
@@ -48,13 +55,20 @@ export default function Header() {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="p-2 text-gray-700 hover:text-purple-600 transition-colors">
+            <button className="p-2 text-gray-700 hover:text-primary transition-colors">
               <Search className="h-5 w-5" />
             </button>
-            <Link href="/track" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Theo dõi đơn hàng">
+            <Link
+              href="/track"
+              className="p-2 text-gray-700 hover:text-primary transition-colors"
+              title="Theo dõi đơn hàng"
+            >
               <Package className="h-5 w-5" />
             </Link>
-            <Link href="/wishlist" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
+            <Link
+              href="/wishlist"
+              className="p-2 text-gray-700 hover:text-primary transition-colors relative"
+            >
               <Heart className="h-5 w-5" />
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -62,10 +76,13 @@ export default function Header() {
                 </span>
               )}
             </Link>
-            <Link href="/checkout" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
+            <Link
+              href="/checkout"
+              className="p-2 text-gray-700 hover:text-primary transition-colors relative"
+            >
               <ShoppingBag className="h-5 w-5" />
               {itemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {itemCount}
                 </span>
               )}
@@ -74,7 +91,7 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="p-2 text-gray-700 hover:text-purple-600 transition-colors"
+                className="p-2 text-gray-700 hover:text-primary transition-colors"
                 aria-haspopup="menu"
                 aria-expanded={isUserMenuOpen}
                 title="Tài khoản"
@@ -106,9 +123,13 @@ export default function Header() {
           <div className="md:hidden">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 text-gray-700 hover:text-purple-600 transition-colors"
+              className="p-2 text-gray-700 hover:text-primary transition-colors"
             >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              {isMenuOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
             </button>
           </div>
         </div>
@@ -121,20 +142,27 @@ export default function Header() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-purple-600 hover:bg-gray-50 rounded-md transition-colors"
+                  className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 rounded-md transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {item.name}
                 </Link>
               ))}
               <div className="flex items-center space-x-4 px-3 py-2">
-                <button className="p-2 text-gray-700 hover:text-purple-600 transition-colors">
+                <button className="p-2 text-gray-700 hover:text-primary transition-colors">
                   <Search className="h-5 w-5" />
                 </button>
-                <Link href="/track" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Theo dõi đơn hàng">
+                <Link
+                  href="/track"
+                  className="p-2 text-gray-700 hover:text-primary transition-colors"
+                  title="Theo dõi đơn hàng"
+                >
                   <Package className="h-5 w-5" />
                 </Link>
-                <Link href="/wishlist" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
+                <Link
+                  href="/wishlist"
+                  className="p-2 text-gray-700 hover:text-primary transition-colors relative"
+                >
                   <Heart className="h-5 w-5" />
                   {wishlistCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-pink-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -142,15 +170,23 @@ export default function Header() {
                     </span>
                   )}
                 </Link>
-                <Link href="/checkout" className="p-2 text-gray-700 hover:text-purple-600 transition-colors relative">
+                <Link
+                  href="/checkout"
+                  className="p-2 text-gray-700 hover:text-primary transition-colors relative"
+                >
                   <ShoppingBag className="h-5 w-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-purple-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-primary text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {itemCount}
                     </span>
                   )}
                 </Link>
-                <Link href="/profile" className="p-2 text-gray-700 hover:text-purple-600 transition-colors" title="Tài khoản" onClick={() => setIsMenuOpen(false)}>
+                <Link
+                  href="/profile"
+                  className="p-2 text-gray-700 hover:text-primary transition-colors"
+                  title="Tài khoản"
+                  onClick={() => setIsMenuOpen(false)}
+                >
                   <User className="h-5 w-5" />
                 </Link>
               </div>

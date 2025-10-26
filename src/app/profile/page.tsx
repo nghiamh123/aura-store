@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { User, Edit, Save, X, Heart, ShoppingBag, Package, Settings, Lock, Shield, ArrowRight } from 'lucide-react';
+import { User, Edit, Save, X, Heart, ShoppingBag, Package, Settings, Lock, Shield, ArrowRight, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function ProfilePage() {
@@ -52,7 +52,7 @@ export default function ProfilePage() {
           gender: u.gender || 'OTHER',
           avatar: u.avatar || ''
         });
-      } catch (e) {
+      } catch {
         setError('Không thể tải hồ sơ người dùng');
       } finally {
         setLoading(false);
@@ -72,7 +72,7 @@ export default function ProfilePage() {
   const handleSave = async () => {
     try {
       setError('');
-      const body: any = {
+      const body: Record<string, unknown> = {
         name: formData.fullName,
         email: formData.email,
         phone: formData.phone,
@@ -121,6 +121,27 @@ export default function ProfilePage() {
   const handleCancel = () => {
     setIsEditing(false);
     // Reset form data if needed
+  };
+
+  const handleLogout = async () => {
+    try {
+      setError('');
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        let message = 'Đăng xuất thất bại';
+        try {
+          const data = (await res.json()) as { error?: string };
+          if (data?.error) message = data.error;
+        } catch {}
+        throw new Error(message);
+      }
+      router.push('/auth/login');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Đăng xuất thất bại');
+    }
   };
 
   const stats = [
@@ -205,6 +226,10 @@ export default function ProfilePage() {
                   <Settings className="h-5 w-5 mr-3" />
                   Cài đặt
                 </button>
+                <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                  <LogOut className="h-5 w-5 mr-3" />
+                  Đăng xuất
+                </button>
               </div>
             </motion.div>
           </div>
@@ -263,7 +288,7 @@ export default function ProfilePage() {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                       isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                     }`}
                   />
@@ -280,7 +305,7 @@ export default function ProfilePage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                       isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                     }`}
                   />
@@ -297,7 +322,7 @@ export default function ProfilePage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                       isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                     }`}
                   />
@@ -314,7 +339,7 @@ export default function ProfilePage() {
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     rows={3}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                       isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                     }`}
                   />
@@ -330,7 +355,7 @@ export default function ProfilePage() {
                       value={formData.ward}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />
@@ -343,7 +368,7 @@ export default function ProfilePage() {
                       value={formData.district}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />
@@ -356,7 +381,7 @@ export default function ProfilePage() {
                       value={formData.city}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />
@@ -373,7 +398,7 @@ export default function ProfilePage() {
                       value={formData.country}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />
@@ -386,7 +411,7 @@ export default function ProfilePage() {
                       value={formData.postalCode}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />
@@ -405,7 +430,7 @@ export default function ProfilePage() {
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                         isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
                       }`}
                     />

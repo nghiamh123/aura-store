@@ -1,11 +1,15 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = useMemo(() => searchParams.get('redirect') || '/profile', [searchParams]);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -13,6 +17,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [serverError, setServerError] = useState<string>('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -51,20 +56,33 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setServerError('');
     if (!validateForm()) {
       return;
     }
 
     setIsLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
-    setIsLoading(false);
-    
-    // Handle login logic here
-    console.log('Login data:', formData);
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email: formData.email, password: formData.password })
+      });
+      if (!res.ok) {
+        let message = 'Đăng nhập thất bại';
+        try {
+          const data = (await res.json()) as { error?: string };
+          if (data?.error) message = data.error;
+        } catch {}
+        throw new Error(message);
+      }
+      router.push(redirectPath);
+    } catch (err) {
+      setServerError(err instanceof Error ? err.message : 'Đăng nhập thất bại');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -100,6 +118,11 @@ export default function LoginPage() {
           className="bg-white py-8 px-6 shadow-lg rounded-2xl"
         >
           <form className="space-y-6" onSubmit={handleSubmit}>
+            {serverError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">
+                {serverError}
+              </div>
+            )}
             {/* Email */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -113,7 +136,7 @@ export default function LoginPage() {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                     errors.email ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Nhập email của bạn"
@@ -137,7 +160,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
                     errors.password ? 'border-red-300' : 'border-gray-300'
                   }`}
                   placeholder="Nhập mật khẩu"
