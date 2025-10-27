@@ -214,7 +214,7 @@ export default function Home() {
                 <p className="text-red-600 mb-4">{error}</p>
                 <Link
                   href="/products"
-                  className="text-purple-600 hover:text-purple-700"
+                  className="text-amber-600 hover:text-amber-700"
                 >
                   Xem tất cả sản phẩm
                 </Link>
@@ -242,7 +242,7 @@ export default function Home() {
                         )}
                       </div>
                       {product.badge && (
-                        <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                        <span className="absolute top-2 left-2 bg-amber-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
                           {product.badge}
                         </span>
                       )}
@@ -291,7 +291,7 @@ export default function Home() {
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
-                          <span className="text-lg font-bold text-purple-600">
+                          <span className="text-lg font-bold text-black">
                             {product.price.toLocaleString()}đ
                           </span>
                           {product.originalPrice &&
@@ -301,7 +301,7 @@ export default function Home() {
                               </span>
                             )}
                         </div>
-                        <button className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+                        <button className="p-2 bg-amber-500 text-white rounded-lg hover:bg-amber-500 transition-colors">
                           <ShoppingBag className="h-4 w-4" />
                         </button>
                       </div>
@@ -315,7 +315,7 @@ export default function Home() {
           <div className="text-center mt-12">
             <Link
               href="/products"
-              className="inline-flex items-center px-8 py-4 bg-amber-200/80 text-primary font-semibold rounded-lg hover:bg-amber-200 transition-colors duration-200 group"
+              className="inline-flex items-center px-8 py-4 bg-amber-400 text-white font-semibold rounded-lg hover:bg-amber-500  transition-colors duration-200 group"
             >
               Xem tất cả sản phẩm
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />

@@ -11,12 +11,15 @@
   "dependencies": {
     "@developer-hub/liquid-glass": "^1.2.3",
     "@next/font": "^14.2.15",
+    "@types/react-slick": "^0.23.13",
     "framer-motion": "^12.23.24",
     "lucide-react": "^0.545.0",
     "next": "15.5.4",
     "next-seo": "^6.8.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
+    "react-slick": "^0.31.0",
+    "slick-carousel": "^1.8.1",
     "zod": "^4.1.12"
   },
   "devDependencies": {

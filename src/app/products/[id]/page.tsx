@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import ImagePreview from "@/components/ImagePreview";
 
 interface Product {
   id: number;
@@ -232,40 +233,23 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Thumbnail Images */}
-            <div className="grid grid-cols-4 gap-2">
-              {(() => {
-                const allImages =
-                  product.images && product.images.length > 0
-                    ? product.images
-                    : product.image
-                    ? [product.image]
-                    : [];
+            {(() => {
+              const allImages =
+                product.images && product.images.length > 0
+                  ? product.images
+                  : product.image
+                  ? [product.image]
+                  : [];
 
-                return allImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImage(index)}
-                    className={`aspect-square bg-white rounded-lg border-2 overflow-hidden transition-all ${
-                      selectedImage === index
-                        ? "border-purple-600 ring-2 ring-purple-200"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <div className="w-full h-full bg-gray-100 flex items-center justify-center">
-                      {image ? (
-                        <img
-                          src={image}
-                          alt={`${product.name} - Ảnh ${index + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-8 h-8 bg-gray-200 rounded"></div>
-                      )}
-                    </div>
-                  </button>
-                ));
-              })()}
-            </div>
+              return allImages.length > 0 ? (
+                <ImagePreview
+                  images={allImages}
+                  selectedImage={selectedImage}
+                  onImageSelect={setSelectedImage}
+                  productName={product.name}
+                />
+              ) : null;
+            })()}
           </div>
 
           {/* Product Info */}
