@@ -1,76 +1,101 @@
-'use client';
+"use client";
 
-import { useCart } from '@/contexts/CartContext';
-import { useWishlist } from '@/contexts/WishlistContext';
-import { motion } from 'framer-motion';
-import { Filter, Grid, Heart, List, Search, ShoppingBag, Star, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
+import { motion } from "framer-motion";
+import {
+  Filter,
+  Grid,
+  Heart,
+  List,
+  Search,
+  ShoppingBag,
+  Star,
+  X,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 
 // Mock search data
 const searchResults = [
   {
     id: 1,
-    name: 'Đồng hồ nam sang trọng',
+    name: "Đồng hồ nam sang trọng",
     price: 299000,
     originalPrice: 399000,
-    image: '/api/placeholder/300/300',
+    image: "/api/placeholder/300/300",
     rating: 4.8,
     reviews: 128,
-    category: 'watches',
-    badge: 'Bán chạy',
-    description: 'Đồng hồ nam sang trọng với thiết kế hiện đại'
+    category: "watches",
+    badge: "Bán chạy",
+    description: "Đồng hồ nam sang trọng với thiết kế hiện đại",
   },
   {
     id: 2,
-    name: 'Túi xách nữ thời trang',
+    name: "Túi xách nữ thời trang",
     price: 199000,
     originalPrice: 299000,
-    image: '/api/placeholder/300/300',
+    image: "/api/placeholder/300/300",
     rating: 4.6,
     reviews: 95,
-    category: 'bags',
-    badge: 'Mới',
-    description: 'Túi xách nữ thời trang với thiết kế trẻ trung'
+    category: "bags",
+    badge: "Mới",
+    description: "Túi xách nữ thời trang với thiết kế trẻ trung",
   },
   {
     id: 3,
-    name: 'Vòng tay trang sức',
+    name: "Vòng tay trang sức",
     price: 89000,
     originalPrice: 149000,
-    image: '/api/placeholder/300/300',
+    image: "/api/placeholder/300/300",
     rating: 4.9,
     reviews: 203,
-    category: 'jewelry',
-    badge: 'Giảm giá',
-    description: 'Vòng tay trang sức với chất liệu cao cấp'
+    category: "jewelry",
+    badge: "Giảm giá",
+    description: "Vòng tay trang sức với chất liệu cao cấp",
   },
   {
     id: 4,
-    name: 'Kính mát thời trang',
+    name: "Kính mát thời trang",
     price: 159000,
     originalPrice: 229000,
-    image: '/api/placeholder/300/300',
+    image: "/api/placeholder/300/300",
     rating: 4.7,
     reviews: 76,
-    category: 'accessories',
-    badge: 'Hot',
-    description: 'Kính mát thời trang với khung kim loại'
-  }
+    category: "accessories",
+    badge: "Hot",
+    description: "Kính mát thời trang với khung kim loại",
+  },
 ];
 
 const categories = [
-  { id: 'all', name: 'Tất cả', count: searchResults.length },
-  { id: 'watches', name: 'Đồng hồ', count: searchResults.filter(p => p.category === 'watches').length },
-  { id: 'bags', name: 'Túi xách', count: searchResults.filter(p => p.category === 'bags').length },
-  { id: 'jewelry', name: 'Trang sức', count: searchResults.filter(p => p.category === 'jewelry').length },
-  { id: 'accessories', name: 'Phụ kiện', count: searchResults.filter(p => p.category === 'accessories').length },
+  { id: "all", name: "Tất cả", count: searchResults.length },
+  {
+    id: "watches",
+    name: "Đồng hồ",
+    count: searchResults.filter((p) => p.category === "watches").length,
+  },
+  {
+    id: "bags",
+    name: "Túi xách",
+    count: searchResults.filter((p) => p.category === "bags").length,
+  },
+  {
+    id: "jewelry",
+    name: "Trang sức",
+    count: searchResults.filter((p) => p.category === "jewelry").length,
+  },
+  {
+    id: "accessories",
+    name: "Phụ kiện",
+    count: searchResults.filter((p) => p.category === "accessories").length,
+  },
 ];
 
 export default function SearchPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
-  const [sortBy, setSortBy] = useState('relevance');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [sortBy, setSortBy] = useState("relevance");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(false);
   const [filteredResults, setFilteredResults] = useState(searchResults);
 
@@ -83,29 +108,30 @@ export default function SearchPage() {
 
     // Filter by search term
     if (searchTerm) {
-      results = results.filter(item =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchTerm.toLowerCase())
+      results = results.filter(
+        (item) =>
+          item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     // Filter by category
-    if (selectedCategory !== 'all') {
-      results = results.filter(item => item.category === selectedCategory);
+    if (selectedCategory !== "all") {
+      results = results.filter((item) => item.category === selectedCategory);
     }
 
     // Sort results
     switch (sortBy) {
-      case 'price-low':
+      case "price-low":
         results = results.sort((a, b) => a.price - b.price);
         break;
-      case 'price-high':
+      case "price-high":
         results = results.sort((a, b) => b.price - a.price);
         break;
-      case 'rating':
+      case "rating":
         results = results.sort((a, b) => b.rating - a.rating);
         break;
-      case 'newest':
+      case "newest":
         results = results.sort((a, b) => b.id - a.id);
         break;
       default:
@@ -150,7 +176,7 @@ export default function SearchPage() {
           <h1 className="text-3xl font-playfair font-bold text-gray-900 mb-4">
             Tìm kiếm sản phẩm
           </h1>
-          
+
           {/* Search Bar */}
           <div className="relative max-w-2xl">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
@@ -159,11 +185,11 @@ export default function SearchPage() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Tìm kiếm sản phẩm..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
             />
             {searchTerm && (
               <button
-                onClick={() => setSearchTerm('')}
+                onClick={() => setSearchTerm("")}
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X className="h-5 w-5" />
@@ -178,8 +204,10 @@ export default function SearchPage() {
           {/* Sidebar Filters */}
           <div className="lg:w-64 flex-shrink-0">
             <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Bộ lọc</h3>
-              
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Bộ lọc
+              </h3>
+
               {/* Categories */}
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -192,8 +220,8 @@ export default function SearchPage() {
                       onClick={() => setSelectedCategory(category.id)}
                       className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${
                         selectedCategory === category.id
-                          ? 'bg-purple-100 text-purple-700 font-medium'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          ? "bg-amber-100 text-amber-700 font-medium"
+                          : "text-gray-600 hover:bg-gray-100"
                       }`}
                     >
                       {category.name} ({category.count})
@@ -210,7 +238,7 @@ export default function SearchPage() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                 >
                   <option value="relevance">Liên quan</option>
                   <option value="price-low">Giá thấp đến cao</option>
@@ -239,20 +267,24 @@ export default function SearchPage() {
                   {searchTerm && ` cho "${searchTerm}"`}
                 </p>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className={`p-2 rounded-lg ${
-                    viewMode === 'grid' ? 'bg-purple-100 text-purple-700' : 'text-gray-400'
+                    viewMode === "grid"
+                      ? "bg-amber-100 text-amber-700"
+                      : "text-gray-400"
                   }`}
                 >
                   <Grid className="h-4 w-4" />
                 </button>
                 <button
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className={`p-2 rounded-lg ${
-                    viewMode === 'list' ? 'bg-purple-100 text-purple-700' : 'text-gray-400'
+                    viewMode === "list"
+                      ? "bg-amber-100 text-amber-700"
+                      : "text-gray-400"
                   }`}
                 >
                   <List className="h-4 w-4" />
@@ -261,11 +293,13 @@ export default function SearchPage() {
             </div>
 
             {/* Results Grid */}
-            <div className={
-              viewMode === 'grid'
-                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6'
-                : 'space-y-4'
-            }>
+            <div
+              className={
+                viewMode === "grid"
+                  ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                  : "space-y-4"
+              }
+            >
               {filteredResults.map((item, index) => (
                 <motion.div
                   key={item.id}
@@ -273,15 +307,23 @@ export default function SearchPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   className={`bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group ${
-                    viewMode === 'list' ? 'flex' : ''
+                    viewMode === "list" ? "flex" : ""
                   }`}
                 >
-                  <div className={`relative ${viewMode === 'list' ? 'w-48 flex-shrink-0' : ''}`}>
-                    <div className={`${viewMode === 'list' ? 'h-48' : 'aspect-square'} bg-gray-100 flex items-center justify-center`}>
+                  <div
+                    className={`relative ${
+                      viewMode === "list" ? "w-48 flex-shrink-0" : ""
+                    }`}
+                  >
+                    <div
+                      className={`${
+                        viewMode === "list" ? "h-48" : "aspect-square"
+                      } bg-gray-100 flex items-center justify-center`}
+                    >
                       <div className="w-24 h-24 bg-gray-200 rounded-lg"></div>
                     </div>
                     {item.badge && (
-                      <span className="absolute top-2 left-2 bg-purple-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      <span className="absolute top-2 left-2 bg-amber-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
                         {item.badge}
                       </span>
                     )}
@@ -289,19 +331,25 @@ export default function SearchPage() {
                       onClick={() => handleWishlistToggle(item)}
                       className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     >
-                      <Heart className={`h-4 w-4 ${isInWishlist(item.id) ? 'text-red-500 fill-current' : 'text-gray-600'}`} />
+                      <Heart
+                        className={`h-4 w-4 ${
+                          isInWishlist(item.id)
+                            ? "text-red-500 fill-current"
+                            : "text-gray-600"
+                        }`}
+                      />
                     </button>
                   </div>
-                  
-                  <div className={`p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+
+                  <div className={`p-4 ${viewMode === "list" ? "flex-1" : ""}`}>
                     <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                       {item.name}
                     </h3>
-                    
+
                     <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                       {item.description}
                     </p>
-                    
+
                     <div className="flex items-center mb-2">
                       <div className="flex items-center">
                         {[...Array(5)].map((_, i) => (
@@ -309,8 +357,8 @@ export default function SearchPage() {
                             key={i}
                             className={`h-4 w-4 ${
                               i < Math.floor(item.rating)
-                                ? 'text-yellow-400 fill-current'
-                                : 'text-gray-300'
+                                ? "text-yellow-400 fill-current"
+                                : "text-gray-300"
                             }`}
                           />
                         ))}
@@ -319,10 +367,10 @@ export default function SearchPage() {
                         ({item.reviews})
                       </span>
                     </div>
-                    
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg font-bold text-purple-600">
+                        <span className="text-lg font-bold text-amber-600">
                           {item.price.toLocaleString()}đ
                         </span>
                         <span className="text-sm text-gray-500 line-through">
@@ -331,7 +379,7 @@ export default function SearchPage() {
                       </div>
                       <button
                         onClick={() => handleAddToCart(item)}
-                        className="p-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                        className="p-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                       >
                         <ShoppingBag className="h-4 w-4" />
                       </button>
@@ -354,10 +402,10 @@ export default function SearchPage() {
                 </p>
                 <button
                   onClick={() => {
-                    setSearchTerm('');
-                    setSelectedCategory('all');
+                    setSearchTerm("");
+                    setSelectedCategory("all");
                   }}
-                  className="px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+                  className="px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
                 >
                   Xóa bộ lọc
                 </button>

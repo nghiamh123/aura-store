@@ -1,41 +1,45 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from 'lucide-react';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle } from "lucide-react";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
+    name: "",
+    email: "",
+    phone: "",
+    subject: "",
+    message: "",
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission here
-    console.log('Form submitted:', formData);
+    console.log("Form submitted:", formData);
     setIsSubmitted(true);
     // Reset form after 3 seconds
     setTimeout(() => {
       setIsSubmitted(false);
       setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
+        name: "",
+        email: "",
+        phone: "",
+        subject: "",
+        message: "",
       });
     }, 3000);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -48,8 +52,8 @@ export default function ContactPage() {
             Liên hệ với chúng tôi
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl">
-            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với chúng tôi 
-            nếu bạn có bất kỳ câu hỏi nào.
+            Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn. Hãy liên hệ với
+            chúng tôi nếu bạn có bất kỳ câu hỏi nào.
           </p>
         </div>
       </div>
@@ -68,33 +72,39 @@ export default function ContactPage() {
                 Thông tin liên hệ
               </h2>
               <p className="text-gray-600 mb-8">
-                Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi qua các 
-                kênh dưới đây hoặc gửi tin nhắn trực tiếp.
+                Chúng tôi luôn sẵn sàng hỗ trợ bạn. Hãy liên hệ với chúng tôi
+                qua các kênh dưới đây hoặc gửi tin nhắn trực tiếp.
               </p>
             </div>
 
             <div className="space-y-6">
               <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <MapPin className="h-6 w-6 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <MapPin className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Địa chỉ</h3>
                   <p className="text-gray-600">
-                    Lê Trung Nghĩa, Phường Bảy Hiền,<br />
+                    Lê Trung Nghĩa, Phường Bảy Hiền,
+                    <br />
                     Thành phố Hồ Chí Minh, Việt Nam
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Phone className="h-6 w-6 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Phone className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Điện thoại</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Điện thoại
+                  </h3>
                   <p className="text-gray-600">
-                    <a href="tel:+84853783578" className="hover:text-purple-600 transition-colors">
+                    <a
+                      href="tel:+84853783578"
+                      className="hover:text-amber-600 transition-colors"
+                    >
                       +84 853 785 378
                     </a>
                   </p>
@@ -102,13 +112,16 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Mail className="h-6 w-6 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Mail className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-1">Email</h3>
                   <p className="text-gray-600">
-                    <a href="mailto:info@aura.com" className="hover:text-purple-600 transition-colors">
+                    <a
+                      href="mailto:info@aura.com"
+                      className="hover:text-amber-600 transition-colors"
+                    >
                       info@aura.com
                     </a>
                   </p>
@@ -116,14 +129,18 @@ export default function ContactPage() {
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Clock className="h-6 w-6 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center">
+                  <Clock className="h-6 w-6 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Giờ làm việc</h3>
+                  <h3 className="font-semibold text-gray-900 mb-1">
+                    Giờ làm việc
+                  </h3>
                   <p className="text-gray-600">
-                    Thứ 2 - Thứ 6: 8:00 - 18:00<br />
-                    Thứ 7: 8:00 - 12:00<br />
+                    Thứ 2 - Thứ 6: 8:00 - 18:00
+                    <br />
+                    Thứ 7: 8:00 - 12:00
+                    <br />
                     Chủ nhật: Nghỉ
                   </p>
                 </div>
@@ -132,9 +149,14 @@ export default function ContactPage() {
 
             {/* Social Media */}
             <div className="pt-6 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-4">Theo dõi chúng tôi</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">
+                Theo dõi chúng tôi
+              </h3>
               <div className="flex space-x-4">
-                <a href="#" className="w-10 h-10 bg-purple-600 text-white rounded-lg flex items-center justify-center hover:bg-purple-700 transition-colors">
+                <a
+                  href="#"
+                  className="w-10 h-10 bg-amber-600 text-white rounded-lg flex items-center justify-center hover:bg-amber-700 transition-colors"
+                >
                   <span className="text-sm font-semibold">f</span>
                 </a>
                 {/* <a href="#" className="w-10 h-10 bg-pink-500 text-white rounded-lg flex items-center justify-center hover:bg-pink-600 transition-colors">
@@ -169,14 +191,18 @@ export default function ContactPage() {
                   Cảm ơn bạn!
                 </h3>
                 <p className="text-gray-600">
-                  Chúng tôi đã nhận được tin nhắn của bạn và sẽ phản hồi trong thời gian sớm nhất.
+                  Chúng tôi đã nhận được tin nhắn của bạn và sẽ phản hồi trong
+                  thời gian sớm nhất.
                 </p>
               </motion.div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Họ và tên *
                     </label>
                     <input
@@ -186,12 +212,15 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent rounded-lg text-gray-700"
                       placeholder="Nhập họ và tên"
                     />
                   </div>
                   <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="phone"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Số điện thoại
                     </label>
                     <input
@@ -200,14 +229,17 @@ export default function ContactPage() {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent rounded-lg text-gray-700"
                       placeholder="Nhập số điện thoại"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Email *
                   </label>
                   <input
@@ -217,13 +249,16 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent rounded-lg text-gray-700"
                     placeholder="Nhập email"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="subject"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Chủ đề *
                   </label>
                   <select
@@ -232,7 +267,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent rounded-lg text-gray-700"
                   >
                     <option value="">Chọn chủ đề</option>
                     <option value="general">Câu hỏi chung</option>
@@ -244,7 +279,10 @@ export default function ContactPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-gray-700 mb-2"
+                  >
                     Tin nhắn *
                   </label>
                   <textarea
@@ -254,14 +292,14 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent rounded-lg text-gray-700"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent rounded-lg text-gray-700"
                     placeholder="Nhập tin nhắn của bạn..."
                   />
                 </div>
 
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center group"
+                  className="w-full bg-amber-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-amber-700 transition-colors duration-200 flex items-center justify-center group"
                 >
                   <Send className="h-5 w-5 mr-2 group-hover:translate-x-1 transition-transform" />
                   Gửi tin nhắn

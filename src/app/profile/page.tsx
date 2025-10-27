@@ -1,29 +1,42 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { User, Edit, Save, X, Heart, ShoppingBag, Package, Settings, Lock, Shield, ArrowRight, LogOut } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import {
+  User,
+  Edit,
+  Save,
+  X,
+  Heart,
+  ShoppingBag,
+  Package,
+  Settings,
+  Lock,
+  Shield,
+  ArrowRight,
+  LogOut,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function ProfilePage() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    phone: '',
-    address: '',
-    ward: '',
-    district: '',
-    city: '',
-    country: '',
-    postalCode: '',
-    dateOfBirth: '',
-    gender: 'OTHER',
-    avatar: ''
+    fullName: "",
+    email: "",
+    phone: "",
+    address: "",
+    ward: "",
+    district: "",
+    city: "",
+    country: "",
+    postalCode: "",
+    dateOfBirth: "",
+    gender: "OTHER",
+    avatar: "",
   });
 
   // Auth guard: require login; load profile
@@ -31,29 +44,34 @@ export default function ProfilePage() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, { credentials: 'include' });
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`,
+          { credentials: "include" }
+        );
         if (res.status === 401) {
-          router.push('/auth/login?redirect=/profile');
+          router.push("/auth/login?redirect=/profile");
           return;
         }
         const data = await res.json();
         const u = data.user;
         setFormData({
-          fullName: u.name || '',
-          email: u.email || '',
-          phone: u.phone || '',
-          address: u.address || '',
-          ward: u.ward || '',
-          district: u.district || '',
-          city: u.city || '',
-          country: u.country || '',
-          postalCode: u.postalCode || '',
-          dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().slice(0,10) : '',
-          gender: u.gender || 'OTHER',
-          avatar: u.avatar || ''
+          fullName: u.name || "",
+          email: u.email || "",
+          phone: u.phone || "",
+          address: u.address || "",
+          ward: u.ward || "",
+          district: u.district || "",
+          city: u.city || "",
+          country: u.country || "",
+          postalCode: u.postalCode || "",
+          dateOfBirth: u.dateOfBirth
+            ? new Date(u.dateOfBirth).toISOString().slice(0, 10)
+            : "",
+          gender: u.gender || "OTHER",
+          avatar: u.avatar || "",
         });
       } catch {
-        setError('Không thể tải hồ sơ người dùng');
+        setError("Không thể tải hồ sơ người dùng");
       } finally {
         setLoading(false);
       }
@@ -61,17 +79,21 @@ export default function ProfilePage() {
     load();
   }, [router]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
   const handleSave = async () => {
     try {
-      setError('');
+      setError("");
       const body: Record<string, unknown> = {
         name: formData.fullName,
         email: formData.email,
@@ -84,20 +106,24 @@ export default function ProfilePage() {
         postalCode: formData.postalCode,
         gender: formData.gender,
       };
-      if (formData.dateOfBirth) body.dateOfBirth = new Date(formData.dateOfBirth).toISOString();
+      if (formData.dateOfBirth)
+        body.dateOfBirth = new Date(formData.dateOfBirth).toISOString();
       if (formData.avatar) body.avatar = formData.avatar;
 
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(body)
-      });
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify(body),
+        }
+      );
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Cập nhật hồ sơ thất bại');
+      if (!res.ok) throw new Error(data.error || "Cập nhật hồ sơ thất bại");
       // sync back returned values
       const u = data.user;
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         fullName: u.name || prev.fullName,
         email: u.email || prev.email,
@@ -108,13 +134,15 @@ export default function ProfilePage() {
         city: u.city || prev.city,
         country: u.country || prev.country,
         postalCode: u.postalCode || prev.postalCode,
-        dateOfBirth: u.dateOfBirth ? new Date(u.dateOfBirth).toISOString().slice(0,10) : prev.dateOfBirth,
+        dateOfBirth: u.dateOfBirth
+          ? new Date(u.dateOfBirth).toISOString().slice(0, 10)
+          : prev.dateOfBirth,
         gender: u.gender || prev.gender,
-        avatar: u.avatar || prev.avatar
+        avatar: u.avatar || prev.avatar,
       }));
       setIsEditing(false);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Cập nhật hồ sơ thất bại');
+      setError(e instanceof Error ? e.message : "Cập nhật hồ sơ thất bại");
     }
   };
 
@@ -125,36 +153,44 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     try {
-      setError('');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/customer/logout`, {
-        method: 'POST',
-        credentials: 'include',
-      });
+      setError("");
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/customer/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
       if (!res.ok) {
-        let message = 'Đăng xuất thất bại';
+        let message = "Đăng xuất thất bại";
         try {
           const data = (await res.json()) as { error?: string };
           if (data?.error) message = data.error;
         } catch {}
         throw new Error(message);
       }
-      router.push('/auth/login');
+      router.push("/auth/login");
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'Đăng xuất thất bại');
+      setError(e instanceof Error ? e.message : "Đăng xuất thất bại");
     }
   };
 
   const stats = [
-    { label: 'Đơn hàng', value: '12', icon: Package, color: 'text-blue-600' },
-    { label: 'Yêu thích', value: '8', icon: Heart, color: 'text-pink-600' },
-    { label: 'Đã mua', value: '24', icon: ShoppingBag, color: 'text-green-600' }
+    { label: "Đơn hàng", value: "12", icon: Package, color: "text-blue-600" },
+    { label: "Yêu thích", value: "8", icon: Heart, color: "text-pink-600" },
+    {
+      label: "Đã mua",
+      value: "24",
+      icon: ShoppingBag,
+      color: "text-green-600",
+    },
   ];
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải hồ sơ...</p>
         </div>
       </div>
@@ -186,22 +222,29 @@ export default function ProfilePage() {
             >
               {/* Avatar */}
               <div className="text-center mb-6">
-                <div className="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <User className="h-12 w-12 text-purple-600" />
+                <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <User className="h-12 w-12 text-amber-600" />
                 </div>
-                <h2 className="text-xl font-semibold text-gray-900">{formData.fullName || 'Khách hàng'}</h2>
+                <h2 className="text-xl font-semibold text-gray-900">
+                  {formData.fullName || "Khách hàng"}
+                </h2>
                 <p className="text-gray-600">{formData.email}</p>
               </div>
 
               {/* Stats */}
               <div className="space-y-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center space-x-3">
                       <stat.icon className={`h-5 w-5 ${stat.color}`} />
                       <span className="text-gray-600">{stat.label}</span>
                     </div>
-                    <span className="font-semibold text-gray-900">{stat.value}</span>
+                    <span className="font-semibold text-gray-900">
+                      {stat.value}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -226,7 +269,10 @@ export default function ProfilePage() {
                   <Settings className="h-5 w-5 mr-3" />
                   Cài đặt
                 </button>
-                <button onClick={handleLogout} className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                >
                   <LogOut className="h-5 w-5 mr-3" />
                   Đăng xuất
                 </button>
@@ -243,11 +289,13 @@ export default function ProfilePage() {
               className="bg-white rounded-2xl shadow-lg p-6"
             >
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900">Thông tin cá nhân</h3>
+                <h3 className="text-xl font-semibold text-gray-900">
+                  Thông tin cá nhân
+                </h3>
                 {!isEditing ? (
                   <button
                     onClick={() => setIsEditing(true)}
-                    className="flex items-center px-4 py-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                    className="flex items-center px-4 py-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors"
                   >
                     <Edit className="h-4 w-4 mr-2" />
                     Chỉnh sửa
@@ -256,7 +304,7 @@ export default function ProfilePage() {
                   <div className="flex space-x-2">
                     <button
                       onClick={handleSave}
-                      className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                     >
                       <Save className="h-4 w-4 mr-2" />
                       Lưu
@@ -273,10 +321,18 @@ export default function ProfilePage() {
               </div>
 
               {error && (
-                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">{error}</div>
+                <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded">
+                  {error}
+                </div>
               )}
 
-              <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); void handleSave(); }}>
+              <form
+                className="space-y-6"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  void handleSave();
+                }}
+              >
                 {/* Full Name */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -288,8 +344,10 @@ export default function ProfilePage() {
                     value={formData.fullName}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                      isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                      isEditing
+                        ? "border-gray-300"
+                        : "border-gray-200 bg-gray-50"
                     }`}
                   />
                 </div>
@@ -305,8 +363,10 @@ export default function ProfilePage() {
                     value={formData.email}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                      isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                      isEditing
+                        ? "border-gray-300"
+                        : "border-gray-200 bg-gray-50"
                     }`}
                   />
                 </div>
@@ -322,8 +382,10 @@ export default function ProfilePage() {
                     value={formData.phone}
                     onChange={handleInputChange}
                     disabled={!isEditing}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                      isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                      isEditing
+                        ? "border-gray-300"
+                        : "border-gray-200 bg-gray-50"
                     }`}
                   />
                 </div>
@@ -339,8 +401,10 @@ export default function ProfilePage() {
                     onChange={handleInputChange}
                     disabled={!isEditing}
                     rows={3}
-                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                      isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                      isEditing
+                        ? "border-gray-300"
+                        : "border-gray-200 bg-gray-50"
                     }`}
                   />
                 </div>
@@ -348,41 +412,53 @@ export default function ProfilePage() {
                 {/* Ward / District / City */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phường/Xã</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Phường/Xã
+                    </label>
                     <input
                       type="text"
                       name="ward"
                       value={formData.ward}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Quận/Huyện</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Quận/Huyện
+                    </label>
                     <input
                       type="text"
                       name="district"
                       value={formData.district}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Tỉnh/Thành phố</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tỉnh/Thành phố
+                    </label>
                     <input
                       type="text"
                       name="city"
                       value={formData.city}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
@@ -391,28 +467,36 @@ export default function ProfilePage() {
                 {/* Country / Postal */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Quốc gia</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Quốc gia
+                    </label>
                     <input
                       type="text"
                       name="country"
                       value={formData.country}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Mã bưu chính</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Mã bưu chính
+                    </label>
                     <input
                       type="text"
                       name="postalCode"
                       value={formData.postalCode}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
@@ -430,8 +514,10 @@ export default function ProfilePage() {
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     />
                   </div>
@@ -446,8 +532,10 @@ export default function ProfilePage() {
                       value={formData.gender}
                       onChange={handleInputChange}
                       disabled={!isEditing}
-                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
-                        isEditing ? 'border-gray-300' : 'border-gray-200 bg-gray-50'
+                      className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
+                        isEditing
+                          ? "border-gray-300"
+                          : "border-gray-200 bg-gray-50"
                       }`}
                     >
                       <option value="MALE">Nam</option>
@@ -460,14 +548,20 @@ export default function ProfilePage() {
 
               {/* Security Section */}
               <div className="mt-8 pt-6 border-t border-gray-200">
-                <h4 className="text-lg font-semibold text-gray-900 mb-4">Bảo mật</h4>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                  Bảo mật
+                </h4>
                 <div className="space-y-4">
                   <button className="flex items-center justify-between w-full p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                     <div className="flex items-center space-x-3">
                       <Lock className="h-5 w-5 text-gray-600" />
                       <div>
-                        <p className="font-medium text-gray-900">Đổi mật khẩu</p>
-                        <p className="text-sm text-gray-600">Cập nhật mật khẩu của bạn</p>
+                        <p className="font-medium text-gray-900">
+                          Đổi mật khẩu
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Cập nhật mật khẩu của bạn
+                        </p>
                       </div>
                     </div>
                     <ArrowRight className="h-5 w-5 text-gray-400" />
@@ -477,8 +571,12 @@ export default function ProfilePage() {
                     <div className="flex items-center space-x-3">
                       <Shield className="h-5 w-5 text-gray-600" />
                       <div>
-                        <p className="font-medium text-gray-900">Xác thực 2 bước</p>
-                        <p className="text-sm text-gray-600">Bảo mật tài khoản của bạn</p>
+                        <p className="font-medium text-gray-900">
+                          Xác thực 2 bước
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Bảo mật tài khoản của bạn
+                        </p>
                       </div>
                     </div>
                     <ArrowRight className="h-5 w-5 text-gray-400" />

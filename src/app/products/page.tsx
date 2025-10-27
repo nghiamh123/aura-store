@@ -77,9 +77,18 @@ export default function ProductsPage() {
     for (const p of products) {
       map[p.category] = (map[p.category] || 0) + 1;
     }
+
+    // Mapping từ tiếng Anh sang tiếng Việt
+    const categoryNames: Record<string, string> = {
+      watches: "Đồng hồ",
+      jewelry: "Trang sức",
+      bags: "Túi xách",
+      accessories: "Phụ kiện",
+    };
+
     const arr = Object.entries(map).map(([id, count]) => ({
       id,
-      name: id,
+      name: categoryNames[id] || id,
       count,
     }));
     return [{ id: "all", name: "Tất cả", count: products.length }, ...arr];

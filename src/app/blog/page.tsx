@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Calendar, ArrowRight } from 'lucide-react';
-import { API_BASE_URL } from '@/lib/api';
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import { Calendar, ArrowRight } from "lucide-react";
+import { API_BASE_URL } from "@/lib/api";
 
 type Post = {
   id: number;
@@ -25,12 +25,12 @@ export default function BlogPage() {
     const load = async () => {
       try {
         setLoading(true);
-        const res = await fetch(`${API_BASE_URL}/posts`, { cache: 'no-store' });
+        const res = await fetch(`${API_BASE_URL}/posts`, { cache: "no-store" });
         if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
         const data = await res.json();
         setPosts(data.posts || []);
       } catch (e) {
-        setError('Không thể tải bài viết');
+        setError("Không thể tải bài viết");
       } finally {
         setLoading(false);
       }
@@ -47,8 +47,8 @@ export default function BlogPage() {
             Blog Aura
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl">
-            Khám phá những bài viết về thời trang, xu hướng và tips chăm sóc phụ kiện 
-            dành cho giới trẻ
+            Khám phá những bài viết về thời trang, xu hướng và tips chăm sóc phụ
+            kiện dành cho giới trẻ
           </p>
         </div>
       </div>
@@ -58,7 +58,10 @@ export default function BlogPage() {
         {loading && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse">
+              <div
+                key={i}
+                className="bg-white rounded-xl shadow-lg overflow-hidden animate-pulse"
+              >
                 <div className="aspect-video bg-gray-200" />
                 <div className="p-6">
                   <div className="h-4 bg-gray-200 rounded w-1/3 mb-3" />
@@ -70,7 +73,9 @@ export default function BlogPage() {
             ))}
           </div>
         )}
-        {error && !loading && <div className="text-center text-red-600">{error}</div>}
+        {error && !loading && (
+          <div className="text-center text-red-600">{error}</div>
+        )}
 
         {/* Featured Post */}
         {posts.length > 0 && (
@@ -84,13 +89,17 @@ export default function BlogPage() {
                 <div className="relative">
                   <div className="aspect-video bg-gray-100 flex items-center justify-center">
                     {posts[0].coverImage ? (
-                      <img src={posts[0].coverImage} alt={posts[0].title} className="w-full h-full object-cover" />
+                      <img
+                        src={posts[0].coverImage}
+                        alt={posts[0].title}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-32 h-20 bg-gray-200 rounded-lg"></div>
                     )}
                   </div>
                   <div className="absolute top-4 left-4">
-                    <span className="bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
+                    <span className="bg-amber-600 text-white text-xs font-semibold px-3 py-1 rounded-full">
                       Nổi bật
                     </span>
                   </div>
@@ -106,12 +115,16 @@ export default function BlogPage() {
                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                       <div className="flex items-center space-x-1">
                         <Calendar className="h-4 w-4" />
-                        <span>{new Date(posts[0].createdAt).toLocaleDateString('vi-VN')}</span>
+                        <span>
+                          {new Date(posts[0].createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </span>
                       </div>
                     </div>
                     <Link
                       href={`/blog/${posts[0].slug}`}
-                      className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium group"
+                      className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium group"
                     >
                       Đọc thêm
                       <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -136,31 +149,37 @@ export default function BlogPage() {
               <div className="relative">
                 <div className="aspect-video bg-gray-100 flex items-center justify-center">
                   {post.coverImage ? (
-                    <img src={post.coverImage} alt={post.title} className="w-full h-full object-cover" />
+                    <img
+                      src={post.coverImage}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-24 h-16 bg-gray-200 rounded-lg"></div>
                   )}
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <div className="flex items-center space-x-4 mb-3 text-sm text-gray-500">
                   <Calendar className="h-4 w-4" />
-                  <span>{new Date(post.createdAt).toLocaleDateString('vi-VN')}</span>
+                  <span>
+                    {new Date(post.createdAt).toLocaleDateString("vi-VN")}
+                  </span>
                 </div>
-                
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors">
+
+                <h3 className="text-xl font-semibold text-gray-900 mb-3 line-clamp-2 group-hover:text-amber-600 transition-colors">
                   {post.title}
                 </h3>
-                
+
                 <p className="text-gray-600 mb-4 line-clamp-3">
                   {post.excerpt}
                 </p>
-                
+
                 <div className="flex items-center justify-between">
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="inline-flex items-center text-purple-600 hover:text-purple-700 font-medium text-sm group"
+                    className="inline-flex items-center text-amber-600 hover:text-amber-700 font-medium text-sm group"
                   >
                     Đọc thêm
                     <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
@@ -172,18 +191,20 @@ export default function BlogPage() {
         </div>
         {posts.length === 0 && !loading && (
           <div className="text-center py-12">
-            <p className="text-gray-500 text-lg">Không có bài viết nào trong danh mục này</p>
+            <p className="text-gray-500 text-lg">
+              Không có bài viết nào trong danh mục này
+            </p>
           </div>
         )}
 
         {/* Newsletter */}
-        <div className="mt-16 bg-gradient-to-r from-purple-600 to-pink-600 rounded-2xl p-8 text-white text-center">
+        <div className="mt-16 bg-gradient-to-r from-amber-600 to-pink-600 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-playfair font-bold mb-4">
             Đăng ký nhận tin tức
           </h3>
-          <p className="text-purple-100 mb-6 max-w-2xl mx-auto">
-            Nhận những bài viết mới nhất về thời trang và xu hướng phụ kiện 
-            trực tiếp vào hộp thư của bạn
+          <p className="text-amber-100 mb-6 max-w-2xl mx-auto">
+            Nhận những bài viết mới nhất về thời trang và xu hướng phụ kiện trực
+            tiếp vào hộp thư của bạn
           </p>
           <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
             <input
@@ -191,7 +212,7 @@ export default function BlogPage() {
               placeholder="Nhập email của bạn"
               className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:ring-2 focus:ring-white focus:outline-none"
             />
-            <button className="px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
+            <button className="px-6 py-3 bg-white text-amber-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors">
               Đăng ký
             </button>
           </div>

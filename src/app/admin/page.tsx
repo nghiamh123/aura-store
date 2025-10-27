@@ -483,7 +483,7 @@ export default function AdminDashboard() {
     const colors = {
       CONFIRMED: "bg-blue-100 text-blue-800",
       PROCESSING: "bg-yellow-100 text-yellow-800",
-      SHIPPED: "bg-purple-100 text-purple-800",
+      SHIPPED: "bg-amber-100 text-amber-800",
       DELIVERED: "bg-green-100 text-green-800",
       CANCELLED: "bg-red-100 text-red-800",
     };
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
                 <Shield className="h-4 w-4" />
                 <span>Xin chào, {adminUser}</span>
               </div>
-              {/* <button className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+              {/* <button className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors">
                   <Plus className="h-4 w-4 mr-2" />
                   Thêm sản phẩm
                 </button> */}
@@ -560,7 +560,7 @@ export default function AdminDashboard() {
               change: "+3.1%",
               changeType: "increase",
               icon: Package,
-              color: "text-purple-600",
+              color: "text-amber-600",
             },
             {
               title: "Khách hàng",
@@ -634,7 +634,7 @@ export default function AdminDashboard() {
                   onClick={() => setActiveTab(tab.id)}
                   className={`py-4 px-2 border-b-2 font-medium text-sm transition-colors ${
                     activeTab === tab.id
-                      ? "border-purple-600 text-purple-600"
+                      ? "border-amber-600 text-amber-600"
                       : "border-transparent text-gray-500 hover:text-gray-700"
                   }`}
                 >
@@ -663,8 +663,8 @@ export default function AdminDashboard() {
                         className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <ShoppingBag className="h-5 w-5 text-purple-600" />
+                          <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                            <ShoppingBag className="h-5 w-5 text-amber-600" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">
@@ -742,7 +742,7 @@ export default function AdminDashboard() {
                   </h3>
                   <button
                     onClick={() => setShowCreatePost(true)}
-                    className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Thêm bài viết
@@ -778,7 +778,7 @@ export default function AdminDashboard() {
                             <a
                               href={`/blog/${p.slug}`}
                               target="_blank"
-                              className="text-purple-600 hover:text-purple-700 text-sm"
+                              className="text-amber-600 hover:text-amber-700 text-sm"
                             >
                               Xem
                             </a>
@@ -804,7 +804,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setPostForm({ ...postForm, title: e.target.value })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         />
                       </div>
                       <div>
@@ -821,7 +821,7 @@ export default function AdminDashboard() {
                                 .replace(/[^a-z0-9-]+/g, "-"),
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         />
                       </div>
                       <div className="md:col-span-2">
@@ -837,7 +837,7 @@ export default function AdminDashboard() {
                             })
                           }
                           rows={2}
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         />
                       </div>
                       <div className="md:col-span-2">
@@ -853,7 +853,7 @@ export default function AdminDashboard() {
                             })
                           }
                           rows={6}
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         />
                       </div>
                       <div>
@@ -865,7 +865,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setPostForm({ ...postForm, tags: e.target.value })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         />
                       </div>
                       <div>
@@ -877,7 +877,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setPostForm({ ...postForm, status: e.target.value })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         >
                           <option value="DRAFT">Nháp</option>
                           <option value="PUBLISHED">Xuất bản</option>
@@ -900,7 +900,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setCoverFile(e.target.files?.[0] || null)
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer text-gray-700"
                         />
                       </div>
                       <div>
@@ -914,7 +914,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setPostFiles(Array.from(e.target.files || []))
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer text-gray-700"
                         />
                       </div>
                     </div>
@@ -923,7 +923,7 @@ export default function AdminDashboard() {
                       <button
                         disabled={uploading}
                         onClick={createPost}
-                        className="px-5 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                        className="px-5 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50"
                       >
                         {uploading ? "Đang tạo..." : "Tạo bài viết"}
                       </button>
@@ -952,7 +952,7 @@ export default function AdminDashboard() {
                       <input
                         type="text"
                         placeholder="Tìm kiếm đơn hàng..."
-                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                       />
                     </div>
                     <button className="flex items-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -990,7 +990,7 @@ export default function AdminDashboard() {
                       {loadingOrders ? (
                         <tr>
                           <td colSpan={6} className="px-6 py-4 text-center">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto"></div>
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600 mx-auto"></div>
                             <p className="text-gray-500 mt-2">
                               Đang tải đơn hàng...
                             </p>
@@ -1047,7 +1047,7 @@ export default function AdminDashboard() {
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <div className="flex items-center space-x-2">
                                 <button
-                                  className="text-purple-600 hover:text-purple-900"
+                                  className="text-amber-600 hover:text-amber-900"
                                   title="Xem chi tiết"
                                 >
                                   <Eye className="h-4 w-4" />
@@ -1096,7 +1096,7 @@ export default function AdminDashboard() {
                                 status: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                           >
                             <option value="CONFIRMED">Đã xác nhận</option>
                             <option value="PROCESSING">Đang xử lý</option>
@@ -1119,7 +1119,7 @@ export default function AdminDashboard() {
                                 trackingNumber: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                             placeholder="Nhập mã vận đơn"
                           />
                         </div>
@@ -1136,7 +1136,7 @@ export default function AdminDashboard() {
                                 notes: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                             rows={3}
                             placeholder="Nhập ghi chú"
                           />
@@ -1159,7 +1159,7 @@ export default function AdminDashboard() {
                         </button>
                         <button
                           onClick={() => updateOrderStatus(editingOrder)}
-                          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                          className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700"
                         >
                           Cập nhật
                         </button>
@@ -1178,7 +1178,7 @@ export default function AdminDashboard() {
                   </h3>
                   <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    className="flex items-center px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     Thêm sản phẩm
@@ -1292,7 +1292,7 @@ export default function AdminDashboard() {
                               name: e.target.value,
                             })
                           }
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
                             !createForm.name.trim()
                               ? "border-red-300"
                               : "border-gray-300"
@@ -1317,7 +1317,7 @@ export default function AdminDashboard() {
                               category: e.target.value,
                             })
                           }
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
                             !createForm.category.trim()
                               ? "border-red-300"
                               : "border-gray-300"
@@ -1355,7 +1355,7 @@ export default function AdminDashboard() {
                               price: e.target.value,
                             })
                           }
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
                             !createForm.price.trim() ||
                             isNaN(Number(createForm.price)) ||
                             Number(createForm.price) <= 0
@@ -1385,7 +1385,7 @@ export default function AdminDashboard() {
                               originalPrice: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="399000"
                         />
                       </div>
@@ -1412,7 +1412,7 @@ export default function AdminDashboard() {
                               rating: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="4.8"
                         />
                       </div>
@@ -1429,7 +1429,7 @@ export default function AdminDashboard() {
                               reviewCount: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="128"
                         />
                       </div>
@@ -1453,7 +1453,7 @@ export default function AdminDashboard() {
                               description: e.target.value,
                             })
                           }
-                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700 ${
+                          className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700 ${
                             !createForm.description.trim()
                               ? "border-red-300"
                               : "border-gray-300"
@@ -1479,7 +1479,7 @@ export default function AdminDashboard() {
                               detailedDescription: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="Mô tả chi tiết về sản phẩm, đặc điểm nổi bật..."
                         />
                       </div>
@@ -1502,7 +1502,7 @@ export default function AdminDashboard() {
                               material: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="Thép không gỉ + Da thật"
                         />
                       </div>
@@ -1518,7 +1518,7 @@ export default function AdminDashboard() {
                               size: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="42mm"
                         />
                       </div>
@@ -1534,7 +1534,7 @@ export default function AdminDashboard() {
                               color: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="Đen, Trắng, Xanh"
                         />
                       </div>
@@ -1550,7 +1550,7 @@ export default function AdminDashboard() {
                               warranty: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                           placeholder="24 tháng"
                         />
                       </div>
@@ -1573,7 +1573,7 @@ export default function AdminDashboard() {
                               badge: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         >
                           <option value="">Không có</option>
                           <option value="Bán chạy">Bán chạy</option>
@@ -1594,7 +1594,7 @@ export default function AdminDashboard() {
                               status: e.target.value,
                             })
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-gray-700"
                         >
                           <option value="active">Đang bán</option>
                           <option value="inactive">Ngừng bán</option>
@@ -1616,7 +1616,7 @@ export default function AdminDashboard() {
                           type="file"
                           accept="image/*"
                           onChange={(e) => setFile(e.target.files?.[0] || null)}
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer text-gray-700"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 5MB
@@ -1634,7 +1634,7 @@ export default function AdminDashboard() {
                           onChange={(e) =>
                             setFiles(Array.from(e.target.files || []))
                           }
-                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent cursor-pointer text-gray-700"
+                          className="w-full px-3 py-2 border rounded-lg border-gray-300 focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer text-gray-700"
                         />
                         <p className="text-xs text-gray-500 mt-1">
                           Có thể chọn nhiều ảnh cùng lúc. Hỗ trợ: JPG, PNG, GIF.
@@ -1649,7 +1649,7 @@ export default function AdminDashboard() {
                               {files.map((file, index) => (
                                 <span
                                   key={index}
-                                  className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs"
+                                  className="px-2 py-1 bg-amber-100 text-amber-700 rounded text-xs"
                                 >
                                   {file.name}
                                 </span>
@@ -1667,7 +1667,7 @@ export default function AdminDashboard() {
                           className={`px-6 py-2 rounded-lg text-white font-medium ${
                             uploading || !isFormValid()
                               ? "bg-gray-400 cursor-not-allowed"
-                              : "bg-purple-600 hover:bg-purple-700"
+                              : "bg-amber-600 hover:bg-amber-700"
                           }`}
                         >
                           {uploading ? "Đang tải..." : "Tạo sản phẩm"}

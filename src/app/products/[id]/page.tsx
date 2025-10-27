@@ -134,7 +134,7 @@ export default function ProductDetailPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Đang tải thông tin sản phẩm...</p>
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function ProductDetailPage() {
           </p>
           <Link
             href="/products"
-            className="text-purple-600 hover:text-purple-700"
+            className="text-amber-600 hover:text-amber-700"
           >
             ← Quay lại danh sách sản phẩm
           </Link>
@@ -325,7 +325,7 @@ export default function ProductDetailPage() {
                     onClick={() => setSelectedSize(size)}
                     className={`w-12 h-12 border-2 rounded-lg font-semibold transition-colors text-gray-500 ${
                       selectedSize === size
-                        ? "border-purple-600 bg-purple-100 text-purple-700"
+                        ? "border-amber-600 bg-amber-100 text-amber-700"
                         : "border-gray-300 hover:border-gray-400"
                     }`}
                   >
@@ -347,7 +347,7 @@ export default function ProductDetailPage() {
                     onClick={() => setSelectedColor(color.value)}
                     className={`w-10 h-10 rounded-full border-2 transition-all ${
                       selectedColor === color.value
-                        ? "border-purple-600 scale-110"
+                        ? "border-amber-600 scale-110"
                         : "border-gray-300 hover:scale-105"
                     } ${color.class}`}
                     title={color.name}

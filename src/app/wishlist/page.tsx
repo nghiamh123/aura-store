@@ -91,7 +91,7 @@ export default function WishlistPage() {
           <p className="text-red-600 mb-4">{error}</p>
           <Link
             href="/products"
-            className="text-purple-600 hover:text-purple-700"
+            className="text-amber-600 hover:text-amber-700"
           >
             Tiếp tục mua sắm
           </Link>
@@ -127,7 +127,7 @@ export default function WishlistPage() {
             </p>
             <Link
               href="/products"
-              className="inline-flex items-center px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
             >
               Khám phá sản phẩm
               <ArrowRight className="ml-2 h-5 w-5" />

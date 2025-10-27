@@ -68,7 +68,7 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="relative bg-gradient-to-br from-purple-50 to-pink-50 py-20 lg:py-32 before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black before:opacity-50"
+        className="relative bg-gradient-to-br from-amber-50 to-pink-50 py-20 lg:py-32 before:absolute before:top-0 before:left-0 before:w-full before:h-full before:bg-black before:opacity-50"
         style={{
           backgroundImage:
             "url(https://aura-store-bucket.s3.ap-southeast-2.amazonaws.com/background/banner.jpg)",
@@ -131,7 +131,7 @@ export default function Home() {
                       name: "Đồng hồ",
                       bgUrl:
                         "https://aura-store-bucket.s3.ap-southeast-2.amazonaws.com/background/318040e8144f6a875fc9bcca1ba1984f.jpg",
-                      iconColor: "bg-purple-800",
+                      iconColor: "bg-amber-800",
                     },
                     {
                       name: "Trang sức",
@@ -329,7 +329,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🚚</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -341,7 +341,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">💎</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
@@ -353,7 +353,7 @@ export default function Home() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🔄</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">

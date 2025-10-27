@@ -138,7 +138,7 @@ function RegisterForm() {
           className="text-center"
         >
           <Link href="/" className="inline-block">
-            <span className="text-3xl font-playfair font-bold text-purple-600">
+            <span className="text-3xl font-playfair font-bold text-amber-600">
               Aura
             </span>
           </Link>
@@ -149,7 +149,7 @@ function RegisterForm() {
             Hoặc{" "}
             <Link
               href="/auth/login"
-              className="font-medium text-purple-600 hover:text-purple-500"
+              className="font-medium text-amber-600 hover:text-amber-500"
             >
               đăng nhập vào tài khoản hiện có
             </Link>
@@ -185,7 +185,7 @@ function RegisterForm() {
                   type="text"
                   value={formData.fullName}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
                     errors.fullName ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Nhập họ và tên"
@@ -212,7 +212,7 @@ function RegisterForm() {
                   type="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
                     errors.email ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Nhập email của bạn"
@@ -239,7 +239,7 @@ function RegisterForm() {
                   type="tel"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
                     errors.phone ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Nhập số điện thoại"
@@ -266,7 +266,7 @@ function RegisterForm() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
                     errors.password ? "border-red-300" : "border-gray-300"
                   }`}
                   placeholder="Nhập mật khẩu"
@@ -304,7 +304,7 @@ function RegisterForm() {
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
-                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent ${
+                  className={`w-full pl-10 pr-12 py-3 border rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent ${
                     errors.confirmPassword
                       ? "border-red-300"
                       : "border-gray-300"
@@ -338,7 +338,7 @@ function RegisterForm() {
                   name="agreeTerms"
                   checked={formData.agreeTerms}
                   onChange={handleInputChange}
-                  className={`mt-1 h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded ${
+                  className={`mt-1 h-4 w-4 text-amber-600 focus:ring-amber-500 border-gray-300 rounded ${
                     errors.agreeTerms ? "border-red-300" : ""
                   }`}
                 />
@@ -346,14 +346,14 @@ function RegisterForm() {
                   Tôi đồng ý với{" "}
                   <Link
                     href="/terms"
-                    className="text-purple-600 hover:text-purple-500"
+                    className="text-amber-600 hover:text-amber-500"
                   >
                     Điều khoản sử dụng
                   </Link>{" "}
                   và{" "}
                   <Link
                     href="/privacy"
-                    className="text-purple-600 hover:text-purple-500"
+                    className="text-amber-600 hover:text-amber-500"
                   >
                     Chính sách bảo mật
                   </Link>
@@ -371,7 +371,7 @@ function RegisterForm() {
               className={`w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white transition-colors ${
                 isLoading
                   ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  : "bg-amber-600 hover:bg-amber-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
               }`}
             >
               {isLoading ? (
@@ -450,7 +450,7 @@ export default function RegisterPage() {
       fallback={
         <div className="min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto mb-4"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto mb-4"></div>
             <p className="text-gray-600">Đang tải...</p>
           </div>
         </div>

@@ -28,17 +28,17 @@ export default function Footer() {
               <a
                 href="https://www.facebook.com/aura.jewelry.2025/"
                 target="_blank"
-                className="text-gray-400 hover:text-purple-400 transition-colors"
+                className="text-gray-400 hover:text-amber-400 transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="text-gray-400 hover:text-purple-400 transition-colors"
+                className="text-gray-400 hover:text-amber-400 transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
-              {/* <a href="#" className="text-gray-400 hover:text-purple-400 transition-colors">
+              {/* <a href="#" className="text-gray-400 hover:text-amber-400 transition-colors">
                 <Twitter className="h-5 w-5" />
               </a> */}
             </div>
@@ -51,7 +51,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Trang chủ
                 </Link>
@@ -59,7 +59,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Sản phẩm
                 </Link>
@@ -67,7 +67,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/blog"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Blog
                 </Link>
@@ -75,7 +75,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Liên hệ
                 </Link>
@@ -90,7 +90,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products?category=watches"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Đồng hồ
                 </Link>
@@ -98,7 +98,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products?category=bags"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Túi xách
                 </Link>
@@ -106,7 +106,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products?category=jewelry"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Trang sức
                 </Link>
@@ -114,7 +114,7 @@ export default function Footer() {
               <li>
                 <Link
                   href="/products?category=accessories"
-                  className="text-gray-300 hover:text-purple-400 transition-colors text-sm"
+                  className="text-gray-300 hover:text-amber-400 transition-colors text-sm"
                 >
                   Phụ kiện khác
                 </Link>
@@ -153,13 +153,13 @@ export default function Footer() {
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link
                 href="/privacy"
-                className="text-gray-400 hover:text-purple-400 transition-colors text-sm"
+                className="text-gray-400 hover:text-amber-400 transition-colors text-sm"
               >
                 Chính sách bảo mật
               </Link>
               <Link
                 href="/terms"
-                className="text-gray-400 hover:text-purple-400 transition-colors text-sm"
+                className="text-gray-400 hover:text-amber-400 transition-colors text-sm"
               >
                 Điều khoản sử dụng
               </Link>

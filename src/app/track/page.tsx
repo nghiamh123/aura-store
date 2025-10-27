@@ -1,7 +1,14 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Search, Package, Truck, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { useState } from "react";
+import {
+  Search,
+  Package,
+  Truck,
+  CheckCircle,
+  Clock,
+  XCircle,
+} from "lucide-react";
 
 interface OrderItem {
   id: number;
@@ -18,7 +25,7 @@ interface OrderItem {
 interface Order {
   id: string;
   orderNumber: string;
-  status: 'CONFIRMED' | 'PROCESSING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+  status: "CONFIRMED" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
   total: number;
   trackingNumber?: string;
   customerInfo?: {
@@ -44,86 +51,88 @@ interface Order {
 
 const statusConfig = {
   CONFIRMED: {
-    label: 'Đã xác nhận',
+    label: "Đã xác nhận",
     icon: CheckCircle,
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
-    description: 'Đơn hàng đã được xác nhận và đang được chuẩn bị'
+    color: "text-green-600",
+    bgColor: "bg-green-100",
+    description: "Đơn hàng đã được xác nhận và đang được chuẩn bị",
   },
   PROCESSING: {
-    label: 'Đang xử lý',
+    label: "Đang xử lý",
     icon: Clock,
-    color: 'text-blue-600',
-    bgColor: 'bg-blue-100',
-    description: 'Đơn hàng đang được xử lý và chuẩn bị giao'
+    color: "text-blue-600",
+    bgColor: "bg-blue-100",
+    description: "Đơn hàng đang được xử lý và chuẩn bị giao",
   },
   SHIPPED: {
-    label: 'Đã giao hàng',
+    label: "Đã giao hàng",
     icon: Truck,
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-100',
-    description: 'Đơn hàng đã được giao cho đơn vị vận chuyển'
+    color: "text-amber-600",
+    bgColor: "bg-amber-100",
+    description: "Đơn hàng đã được giao cho đơn vị vận chuyển",
   },
   DELIVERED: {
-    label: 'Đã giao',
+    label: "Đã giao",
     icon: CheckCircle,
-    color: 'text-green-600',
-    bgColor: 'bg-green-100',
-    description: 'Đơn hàng đã được giao thành công'
+    color: "text-green-600",
+    bgColor: "bg-green-100",
+    description: "Đơn hàng đã được giao thành công",
   },
   CANCELLED: {
-    label: 'Đã hủy',
+    label: "Đã hủy",
     icon: XCircle,
-    color: 'text-red-600',
-    bgColor: 'bg-red-100',
-    description: 'Đơn hàng đã bị hủy'
-  }
+    color: "text-red-600",
+    bgColor: "bg-red-100",
+    description: "Đơn hàng đã bị hủy",
+  },
 };
 
 export default function TrackOrderPage() {
-  const [orderNumber, setOrderNumber] = useState('');
+  const [orderNumber, setOrderNumber] = useState("");
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!orderNumber.trim()) return;
 
     setLoading(true);
-    setError('');
+    setError("");
     setOrder(null);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/track/${orderNumber}`);
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/orders/track/${orderNumber}`
+      );
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Không tìm thấy đơn hàng');
+        throw new Error(data.error || "Không tìm thấy đơn hàng");
       }
 
       setOrder(data.order);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Có lỗi xảy ra');
+      setError(err instanceof Error ? err.message : "Có lỗi xảy ra");
     } finally {
       setLoading(false);
     }
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('vi-VN', {
-      style: 'currency',
-      currency: 'VND'
+    return new Intl.NumberFormat("vi-VN", {
+      style: "currency",
+      currency: "VND",
     }).format(price);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -144,7 +153,10 @@ export default function TrackOrderPage() {
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <form onSubmit={handleTrack} className="flex gap-4">
             <div className="flex-1">
-              <label htmlFor="orderNumber" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="orderNumber"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Mã đơn hàng
               </label>
               <input
@@ -168,7 +180,7 @@ export default function TrackOrderPage() {
                 ) : (
                   <Search className="w-5 h-5" />
                 )}
-                {loading ? 'Đang tìm...' : 'Theo dõi'}
+                {loading ? "Đang tìm..." : "Theo dõi"}
               </button>
             </div>
           </form>
@@ -203,7 +215,9 @@ export default function TrackOrderPage() {
                   const config = statusConfig[order.status];
                   const Icon = config.icon;
                   return (
-                    <div className={`flex items-center gap-3 px-4 py-3 rounded-lg ${config.bgColor}`}>
+                    <div
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg ${config.bgColor}`}
+                    >
                       <Icon className={`w-6 h-6 ${config.color}`} />
                       <div>
                         <p className={`font-semibold ${config.color}`}>
@@ -245,11 +259,17 @@ export default function TrackOrderPage() {
                 </h3>
                 {order.customerInfo && (
                   <div className="space-y-2">
-                    <p><strong>Tên:</strong> {order.customerInfo.fullName}</p>
+                    <p>
+                      <strong>Tên:</strong> {order.customerInfo.fullName}
+                    </p>
                     {order.customerInfo.email && (
-                      <p><strong>Email:</strong> {order.customerInfo.email}</p>
+                      <p>
+                        <strong>Email:</strong> {order.customerInfo.email}
+                      </p>
                     )}
-                    <p><strong>Số điện thoại:</strong> {order.customerInfo.phone}</p>
+                    <p>
+                      <strong>Số điện thoại:</strong> {order.customerInfo.phone}
+                    </p>
                   </div>
                 )}
               </div>
@@ -261,12 +281,22 @@ export default function TrackOrderPage() {
                 </h3>
                 {order.shippingInfo && (
                   <div className="space-y-2">
-                    <p><strong>Địa chỉ:</strong> {order.shippingInfo.address}</p>
-                    <p><strong>Phường/Xã:</strong> {order.shippingInfo.ward}</p>
-                    <p><strong>Quận/Huyện:</strong> {order.shippingInfo.district}</p>
-                    <p><strong>Thành phố:</strong> {order.shippingInfo.city}</p>
+                    <p>
+                      <strong>Địa chỉ:</strong> {order.shippingInfo.address}
+                    </p>
+                    <p>
+                      <strong>Phường/Xã:</strong> {order.shippingInfo.ward}
+                    </p>
+                    <p>
+                      <strong>Quận/Huyện:</strong> {order.shippingInfo.district}
+                    </p>
+                    <p>
+                      <strong>Thành phố:</strong> {order.shippingInfo.city}
+                    </p>
                     {order.shippingInfo.note && (
-                      <p><strong>Ghi chú:</strong> {order.shippingInfo.note}</p>
+                      <p>
+                        <strong>Ghi chú:</strong> {order.shippingInfo.note}
+                      </p>
                     )}
                   </div>
                 )}
@@ -280,7 +310,10 @@ export default function TrackOrderPage() {
               </h3>
               <div className="space-y-4">
                 {order.items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg">
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg"
+                  >
                     {item.product.image && (
                       <img
                         src={item.product.image}
@@ -289,8 +322,12 @@ export default function TrackOrderPage() {
                       />
                     )}
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{item.product.name}</h4>
-                      <p className="text-sm text-gray-600">Số lượng: {item.quantity}</p>
+                      <h4 className="font-medium text-gray-900">
+                        {item.product.name}
+                      </h4>
+                      <p className="text-sm text-gray-600">
+                        Số lượng: {item.quantity}
+                      </p>
                     </div>
                     <div className="text-right">
                       <p className="font-semibold text-gray-900">
@@ -309,11 +346,17 @@ export default function TrackOrderPage() {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tạm tính:</span>
-                    <span className="text-gray-700">{formatPrice(order.total - order.shippingFee + order.discount)}</span>
+                    <span className="text-gray-700">
+                      {formatPrice(
+                        order.total - order.shippingFee + order.discount
+                      )}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Phí vận chuyển:</span>
-                    <span className="text-gray-700">{formatPrice(order.shippingFee)}</span>
+                    <span className="text-gray-700">
+                      {formatPrice(order.shippingFee)}
+                    </span>
                   </div>
                   {order.discount > 0 && (
                     <div className="flex justify-between text-green-600">
@@ -323,7 +366,9 @@ export default function TrackOrderPage() {
                   )}
                   <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-2">
                     <span className="text-gray-700">Tổng cộng:</span>
-                    <span className="text-gray-700">{formatPrice(order.total)}</span>
+                    <span className="text-gray-700">
+                      {formatPrice(order.total)}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -338,16 +383,24 @@ export default function TrackOrderPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                   <div>
-                    <p className="font-medium text-gray-900">Đơn hàng được tạo</p>
-                    <p className="text-sm text-gray-600">{formatDate(order.createdAt)}</p>
+                    <p className="font-medium text-gray-900">
+                      Đơn hàng được tạo
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {formatDate(order.createdAt)}
+                    </p>
                   </div>
                 </div>
                 {order.updatedAt !== order.createdAt && (
                   <div className="flex items-center gap-3">
                     <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
                     <div>
-                      <p className="font-medium text-gray-900">Cập nhật lần cuối</p>
-                      <p className="text-sm text-gray-600">{formatDate(order.updatedAt)}</p>
+                      <p className="font-medium text-gray-900">
+                        Cập nhật lần cuối
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {formatDate(order.updatedAt)}
+                      </p>
                     </div>
                   </div>
                 )}
