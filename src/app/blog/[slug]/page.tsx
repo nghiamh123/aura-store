@@ -34,7 +34,7 @@ export default function BlogDetailPage() {
         if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
         const data = await res.json();
         setPost(data.post);
-      } catch (e) {
+      } catch {
         setError("Không thể tải bài viết");
       } finally {
         setLoading(false);
