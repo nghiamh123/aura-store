@@ -1,14 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Search,
-  Package,
-  Truck,
-  CheckCircle,
-  Clock,
-  XCircle,
-} from "lucide-react";
+import { Search, Truck, CheckCircle, Clock, XCircle } from "lucide-react";
 
 interface OrderItem {
   id: number;

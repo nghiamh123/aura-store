@@ -8,7 +8,6 @@ import {
   Package,
   Truck,
   Clock,
-  MapPin,
   Phone,
   Mail,
   Copy,

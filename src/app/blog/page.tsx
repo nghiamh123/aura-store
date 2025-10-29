@@ -29,7 +29,7 @@ export default function BlogPage() {
         if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
         const data = await res.json();
         setPosts(data.posts || []);
-      } catch (e) {
+      } catch {
         setError("Không thể tải bài viết");
       } finally {
         setLoading(false);
