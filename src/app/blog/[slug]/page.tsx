@@ -130,7 +130,7 @@ export default function BlogDetailPage() {
                 key={idx}
                 src={img}
                 alt={`${post.title} ${idx + 1}`}
-                className="w-full rounded-lg object-cover"
+                className="w-full rounded-lg object-cover aspect-square"
               />
             ))}
           </div>
@@ -139,7 +139,11 @@ export default function BlogDetailPage() {
         <article className="prose prose-lg max-w-none prose-headings:font-playfair prose-a:text-amber-600 text-gray-700">
           {/* If content is HTML, you can switch to dangerouslySetInnerHTML */}
           {post.content.split("\n").map((p, i) => (
-            <p key={i}>{p}</p>
+            <>
+              <p key={i} className="mb-4">
+                {p}
+              </p>
+            </>
           ))}
         </article>
       </div>
