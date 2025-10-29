@@ -38,8 +38,6 @@ export default function ImagePreview({
   onImageSelect,
   productName,
 }: ImagePreviewProps) {
-  const [sliderRef, setSliderRef] = useState<Slider | null>(null);
-
   // Slider settings
   const sliderSettings = {
     dots: false,

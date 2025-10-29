@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { apiFetch } from "@/lib/api";
 
 interface ProductFormProps {
@@ -23,7 +22,26 @@ interface ProductFormProps {
     badge: string;
     status: string;
   };
-  setCreateForm: React.Dispatch<React.SetStateAction<any>>;
+  setCreateForm: React.Dispatch<
+    React.SetStateAction<{
+      name: string;
+      description: string;
+      price: string;
+      category: string;
+      image: string;
+      images: string[];
+      originalPrice: string;
+      rating: string;
+      reviewCount: string;
+      detailedDescription: string;
+      material: string;
+      size: string;
+      color: string;
+      warranty: string;
+      badge: string;
+      status: string;
+    }>
+  >;
   file: File | null;
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
   files: File[];
@@ -236,6 +254,9 @@ export default function ProductForm({
       <h4 className="font-semibold mb-6 text-gray-800">
         {editingProduct ? `Sửa sản phẩm #${editingProduct}` : "Thêm sản phẩm"}
       </h4>
+
+      {errorMsg && <div className="mb-4 text-sm text-red-600">{errorMsg}</div>}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Thông tin cơ bản */}
         <div className="md:col-span-2">
