@@ -97,7 +97,7 @@ export default function ImagePreview({
   // If more than 4 images, use slider
   return (
     <div className="relative">
-      <Slider ref={setSliderRef} {...sliderSettings}>
+      <Slider {...sliderSettings}>
         {images.map((image, index) => (
           <div key={index} className="px-1">
             <button
