@@ -1,16 +1,37 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, ShoppingBag, Trash2, ArrowRight, Star } from "lucide-react";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useCart } from "@/contexts/CartContext";
 
 export default function WishlistPage() {
+  const router = useRouter();
   const { items, removeFromWishlist, clearWishlist, loading, error } =
     useWishlist();
   const { addToCart } = useCart();
+
+  // Auth guard: redirect to login if user is not authenticated
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/auth/customer/me`,
+          { credentials: "include" }
+        );
+        if (res.status === 401) {
+          router.push("/auth/login?redirect=/wishlist");
+        }
+      } catch {
+        // If API error, redirect to login for safety
+        router.push("/auth/login?redirect=/wishlist");
+      }
+    };
+    void checkAuth();
+  }, [router]);
   const [actionLoading, setActionLoading] = useState<{
     [key: number]: boolean;
   }>({});
@@ -85,6 +106,32 @@ export default function WishlistPage() {
   }
 
   if (error) {
+    // Nếu lỗi là "chưa đăng nhập", redirect về login
+    if (error.includes("đăng nhập") || error.includes("Chưa đăng nhập")) {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+          <div className="text-center">
+            <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h2 className="text-2xl font-semibold text-gray-900 mb-4">
+              Yêu cầu đăng nhập
+            </h2>
+            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+              {error ||
+                "Bạn cần đăng nhập để xem danh sách yêu thích của mình."}
+            </p>
+            <Link
+              href="/auth/login?redirect=/wishlist"
+              className="inline-flex items-center px-6 py-3 bg-amber-600 text-white font-semibold rounded-lg hover:bg-amber-700 transition-colors"
+            >
+              Đăng nhập
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    // Lỗi khác
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

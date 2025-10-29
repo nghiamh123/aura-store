@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { CartProvider } from "@/contexts/CartContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
+import { generateMetadata as generateBaseMetadata } from "@/lib/metadata";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,17 +17,19 @@ const playfair = Playfair_Display({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
+// Generate base metadata với og:image
+const baseMetadata = generateBaseMetadata({
   title: "Aura - Phụ kiện thời trang nam nữ giá rẻ",
-  description: "Aura - Cửa hàng phụ kiện thời trang nam nữ với giá cả phải chăng, phù hợp cho học sinh sinh viên. Đồng hồ, túi xách, trang sức và nhiều hơn nữa.",
-  keywords: "phụ kiện thời trang, đồng hồ, túi xách, trang sức, học sinh sinh viên, giá rẻ",
+  description:
+    "Aura - Cửa hàng phụ kiện thời trang nam nữ với giá cả phải chăng, phù hợp cho học sinh sinh viên. Đồng hồ, túi xách, trang sức và nhiều hơn nữa.",
+  image: "/og-image-default.jpg", // Ảnh mặc định - có thể thay bằng logo hoặc ảnh banner
+});
+
+export const metadata: Metadata = {
+  ...baseMetadata,
+  keywords:
+    "phụ kiện thời trang, đồng hồ, túi xách, trang sức, học sinh sinh viên, giá rẻ",
   authors: [{ name: "Aura Store" }],
-  openGraph: {
-    title: "Aura - Phụ kiện thời trang nam nữ giá rẻ",
-    description: "Cửa hàng phụ kiện thời trang với giá cả phải chăng, phù hợp cho học sinh sinh viên",
-    type: "website",
-    locale: "vi_VN",
-  },
 };
 
 export default function RootLayout({
@@ -42,9 +45,7 @@ export default function RootLayout({
         <CartProvider>
           <WishlistProvider>
             <Header />
-            <main className="min-h-screen">
-              {children}
-            </main>
+            <main className="min-h-screen">{children}</main>
             <Footer />
           </WishlistProvider>
         </CartProvider>

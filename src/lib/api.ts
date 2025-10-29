@@ -7,7 +7,13 @@ export async function apiFetch<T>(path: string, options: RequestInit = {}): Prom
     ...(options.headers || {}),
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
-  const res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers, cache: 'no-store' });
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    // Ensure auth cookies (customerAuth) are sent for cross-origin requests
+    credentials: 'include',
+    cache: 'no-store',
+    ...options,
+    headers,
+  });
   if (!res.ok) {
     const text = await res.text().catch(() => '');
     throw new Error(text || `Request failed ${res.status}`);

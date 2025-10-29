@@ -1,6 +1,12 @@
-'use client';
+"use client";
 
-import { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
+import {
+  createContext,
+  useContext,
+  useReducer,
+  ReactNode,
+  useEffect,
+} from "react";
 
 // Types
 export interface WishlistItem {
@@ -27,7 +33,7 @@ interface WishlistState {
 }
 
 interface WishlistContextType extends WishlistState {
-  addToWishlist: (item: Omit<WishlistItem, 'addedAt'>) => Promise<void>;
+  addToWishlist: (item: Omit<WishlistItem, "addedAt">) => Promise<void>;
   removeFromWishlist: (id: number) => Promise<void>;
   clearWishlist: () => Promise<void>;
   isInWishlist: (id: number) => boolean;
@@ -36,35 +42,41 @@ interface WishlistContextType extends WishlistState {
 }
 
 // Initial state
-const initialState: WishlistState & { loading: boolean; error: string | null } = {
-  items: [],
-  itemCount: 0,
-  loading: false,
-  error: null,
-};
+const initialState: WishlistState & { loading: boolean; error: string | null } =
+  {
+    items: [],
+    itemCount: 0,
+    loading: false,
+    error: null,
+  };
 
 // Action types
 type WishlistAction =
-  | { type: 'ADD_TO_WISHLIST'; payload: Omit<WishlistItem, 'addedAt'> }
-  | { type: 'REMOVE_FROM_WISHLIST'; payload: number }
-  | { type: 'CLEAR_WISHLIST' }
-  | { type: 'SET_WISHLIST'; payload: WishlistItem[] }
-  | { type: 'SET_LOADING'; payload: boolean }
-  | { type: 'SET_ERROR'; payload: string | null };
+  | { type: "ADD_TO_WISHLIST"; payload: Omit<WishlistItem, "addedAt"> }
+  | { type: "REMOVE_FROM_WISHLIST"; payload: number }
+  | { type: "CLEAR_WISHLIST" }
+  | { type: "SET_WISHLIST"; payload: WishlistItem[] }
+  | { type: "SET_LOADING"; payload: boolean }
+  | { type: "SET_ERROR"; payload: string | null };
 
 // Reducer
-function wishlistReducer(state: typeof initialState, action: WishlistAction): typeof initialState {
+function wishlistReducer(
+  state: typeof initialState,
+  action: WishlistAction
+): typeof initialState {
   switch (action.type) {
-    case 'ADD_TO_WISHLIST': {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      
+    case "ADD_TO_WISHLIST": {
+      const existingItem = state.items.find(
+        (item) => item.id === action.payload.id
+      );
+
       if (existingItem) {
         return state; // Item already in wishlist
       }
-      
+
       const newItem = { ...action.payload, addedAt: new Date() };
       const updatedItems = [...state.items, newItem];
-      
+
       return {
         ...state,
         items: updatedItems,
@@ -72,10 +84,12 @@ function wishlistReducer(state: typeof initialState, action: WishlistAction): ty
         error: null,
       };
     }
-    
-    case 'REMOVE_FROM_WISHLIST': {
-      const updatedItems = state.items.filter(item => item.id !== action.payload);
-      
+
+    case "REMOVE_FROM_WISHLIST": {
+      const updatedItems = state.items.filter(
+        (item) => item.id !== action.payload
+      );
+
       return {
         ...state,
         items: updatedItems,
@@ -83,11 +97,11 @@ function wishlistReducer(state: typeof initialState, action: WishlistAction): ty
         error: null,
       };
     }
-    
-    case 'CLEAR_WISHLIST':
+
+    case "CLEAR_WISHLIST":
       return { ...initialState };
-    
-    case 'SET_WISHLIST':
+
+    case "SET_WISHLIST":
       return {
         ...state,
         items: action.payload,
@@ -95,134 +109,211 @@ function wishlistReducer(state: typeof initialState, action: WishlistAction): ty
         error: null,
         loading: false,
       };
-    
-    case 'SET_LOADING':
+
+    case "SET_LOADING":
       return {
         ...state,
         loading: action.payload,
       };
-    
-    case 'SET_ERROR':
+
+    case "SET_ERROR":
       return {
         ...state,
         error: action.payload,
         loading: false,
       };
-    
+
     default:
       return state;
   }
 }
 
 // Context
-const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
+const WishlistContext = createContext<WishlistContextType | undefined>(
+  undefined
+);
 
 // Provider
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(wishlistReducer, initialState);
 
-  // Fetch wishlist on mount
+  // Fetch wishlist on mount (chỉ khi user đã đăng nhập)
   useEffect(() => {
     const fetchWishlist = async () => {
       try {
-        dispatch({ type: 'SET_LOADING', payload: true });
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`);
-        if (!response.ok) throw new Error('Failed to fetch wishlist');
-        
+        dispatch({ type: "SET_LOADING", payload: true });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (response.status === 401) {
+          // User chưa đăng nhập - không hiển thị lỗi, chỉ clear wishlist
+          dispatch({ type: "SET_WISHLIST", payload: [] });
+          dispatch({ type: "SET_LOADING", payload: false });
+          return;
+        }
+
+        if (!response.ok) throw new Error("Failed to fetch wishlist");
+
         const data = await response.json();
-        dispatch({ type: 'SET_WISHLIST', payload: data.items || [] });
+        dispatch({ type: "SET_WISHLIST", payload: data.items || [] });
       } catch (error) {
-        console.error('Error fetching wishlist:', error);
-        dispatch({ type: 'SET_ERROR', payload: 'Failed to load wishlist' });
+        console.error("Error fetching wishlist:", error);
+        // Không hiển thị lỗi nếu là lỗi 401 (chưa đăng nhập)
+        const isUnauthorized =
+          error instanceof Error && error.message.includes("401");
+        if (!isUnauthorized) {
+          dispatch({ type: "SET_ERROR", payload: "Failed to load wishlist" });
+        } else {
+          dispatch({ type: "SET_WISHLIST", payload: [] });
+        }
+      } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     };
 
     fetchWishlist();
   }, []);
 
-  const addToWishlist = async (item: Omit<WishlistItem, 'addedAt'>) => {
+  const addToWishlist = async (item: Omit<WishlistItem, "addedAt">) => {
     try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productId: item.id }),
-      });
-      
-      if (!response.ok) throw new Error('Failed to add to wishlist');
-      
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ productId: item.id }),
+        }
+      );
+
+      if (response.status === 401) {
+        throw new Error("Vui lòng đăng nhập để thêm vào danh sách yêu thích");
+      }
+
+      if (!response.ok) throw new Error("Failed to add to wishlist");
+
       // Fetch updated wishlist from API to get complete product data
-      const updatedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`);
+      const updatedResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
+        {
+          credentials: "include",
+        }
+      );
       if (updatedResponse.ok) {
         const data = await updatedResponse.json();
-        dispatch({ type: 'SET_WISHLIST', payload: data.items || [] });
+        dispatch({ type: "SET_WISHLIST", payload: data.items || [] });
       } else {
         // Fallback to local state if API fetch fails
-        dispatch({ type: 'ADD_TO_WISHLIST', payload: item });
-        dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: "ADD_TO_WISHLIST", payload: item });
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     } catch (error) {
-      console.error('Error adding to wishlist:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to add to wishlist' });
+      console.error("Error adding to wishlist:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to add to wishlist";
+      dispatch({ type: "SET_ERROR", payload: errorMessage });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
   const removeFromWishlist = async (id: number) => {
     try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist?productId=${id}`, {
-        method: 'DELETE',
-      });
-      
-      if (!response.ok) throw new Error('Failed to remove from wishlist');
-      
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist?productId=${id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (response.status === 401) {
+        throw new Error("Vui lòng đăng nhập để sử dụng wishlist");
+      }
+
+      if (!response.ok) throw new Error("Failed to remove from wishlist");
+
       // Fetch updated wishlist from API to get complete product data
-      const updatedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`);
+      const updatedResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
+        {
+          credentials: "include",
+        }
+      );
       if (updatedResponse.ok) {
         const data = await updatedResponse.json();
-        dispatch({ type: 'SET_WISHLIST', payload: data.items || [] });
+        dispatch({ type: "SET_WISHLIST", payload: data.items || [] });
       } else {
         // Fallback to local state if API fetch fails
-        dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: id });
-        dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: "REMOVE_FROM_WISHLIST", payload: id });
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     } catch (error) {
-      console.error('Error removing from wishlist:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to remove from wishlist' });
+      console.error("Error removing from wishlist:", error);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to remove from wishlist";
+      dispatch({ type: "SET_ERROR", payload: errorMessage });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
   const clearWishlist = async () => {
     try {
-      dispatch({ type: 'SET_LOADING', payload: true });
-      
-      // Remove all items one by one
-      for (const item of state.items) {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist?productId=${item.id}`, {
-          method: 'DELETE',
-        });
+      dispatch({ type: "SET_LOADING", payload: true });
+
+      // Sử dụng endpoint /wishlist/clear mới
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist/clear`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (response.status === 401) {
+        throw new Error("Vui lòng đăng nhập để sử dụng wishlist");
       }
-      
+
+      if (!response.ok) throw new Error("Failed to clear wishlist");
+
       // Fetch updated wishlist from API to confirm it's empty
-      const updatedResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/wishlist`);
+      const updatedResponse = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/wishlist`,
+        {
+          credentials: "include",
+        }
+      );
       if (updatedResponse.ok) {
         const data = await updatedResponse.json();
-        dispatch({ type: 'SET_WISHLIST', payload: data.items || [] });
+        dispatch({ type: "SET_WISHLIST", payload: data.items || [] });
       } else {
         // Fallback to local state if API fetch fails
-        dispatch({ type: 'CLEAR_WISHLIST' });
-        dispatch({ type: 'SET_LOADING', payload: false });
+        dispatch({ type: "CLEAR_WISHLIST" });
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     } catch (error) {
-      console.error('Error clearing wishlist:', error);
-      dispatch({ type: 'SET_ERROR', payload: 'Failed to clear wishlist' });
+      console.error("Error clearing wishlist:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Failed to clear wishlist";
+      dispatch({ type: "SET_ERROR", payload: errorMessage });
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
 
   const isInWishlist = (id: number) => {
-    return state.items.some(item => item.id === id);
+    return state.items.some((item) => item.id === id);
   };
 
   const value: WishlistContextType = {
@@ -244,7 +335,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 export function useWishlist() {
   const context = useContext(WishlistContext);
   if (context === undefined) {
-    throw new Error('useWishlist must be used within a WishlistProvider');
+    throw new Error("useWishlist must be used within a WishlistProvider");
   }
   return context;
 }
